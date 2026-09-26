@@ -169,7 +169,7 @@ export function ContactForm({ defaultTopic = "sales" }: { defaultTopic?: string 
       </label>
 
       <button
-        className="btn w-full justify-center bg-green-600 py-3 text-white hover:bg-green-700 sm:w-auto sm:px-7"
+        className="btn w-full justify-center bg-green-700 py-3 text-white hover:bg-green-800 sm:w-auto sm:px-7"
         disabled={pending}
       >
         {pending ? "Sending..." : <>Send message <Send className="h-4 w-4" /></>}

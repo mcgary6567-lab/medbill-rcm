@@ -65,7 +65,7 @@ export function PatientLink({ id, first, last, mrn }: { id: string; first: strin
   return (
     <Link href={`/patients/${id}`} className="font-medium text-brand-700 hover:underline">
       {last}, {first}
-      {mrn && <span className="ml-1 text-xs text-slate-400">{mrn}</span>}
+      {mrn && <span className="ml-1 text-xs text-slate-500">{mrn}</span>}
     </Link>
   );
 }

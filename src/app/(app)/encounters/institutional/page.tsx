@@ -72,7 +72,7 @@ export default async function InstitutionalEntryPage() {
             <tbody>
               {Array.from({ length: LINES }, (_, i) => (
                 <tr key={i}>
-                  <td className="text-slate-400">{i + 1}</td>
+                  <td className="text-slate-500">{i + 1}</td>
                   <td><input name="rev" className="input w-24 font-mono" placeholder={i === 0 ? "0450" : ""} maxLength={4} inputMode="numeric" /></td>
                   <td><input name="hcpcs" className="input w-28 font-mono" placeholder={i === 0 ? "99284" : ""} maxLength={5} /></td>
                   <td><input name="units" className="input w-20" defaultValue="1" inputMode="numeric" /></td>

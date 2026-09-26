@@ -48,7 +48,7 @@ export default async function DentalEntryPage() {
             <tbody>
               {Array.from({ length: LINES }, (_, i) => (
                 <tr key={i}>
-                  <td className="text-slate-400">{i + 1}</td>
+                  <td className="text-slate-500">{i + 1}</td>
                   <td><input name="cdt" list="cdt-codes" className="input w-28 font-mono" placeholder={i === 0 ? "D2392" : ""} maxLength={5} /></td>
                   <td><input name="tooth" className="input w-20 font-mono" placeholder={i === 0 ? "30" : ""} maxLength={2} /></td>
                   <td><input name="surfaces" className="input w-24 font-mono" placeholder={i === 0 ? "MO" : ""} maxLength={5} /></td>

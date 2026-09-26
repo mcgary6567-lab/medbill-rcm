@@ -39,7 +39,7 @@ export default async function CompliancePage({ searchParams }: { searchParams: P
       <div className="mb-6 grid gap-4 md:grid-cols-3">
         <div className="card p-5 md:col-span-1">
           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Controls passing</p>
-          <p className="mt-1 text-4xl font-extrabold">{passing}<span className="text-xl text-slate-400"> / {controls.length}</span></p>
+          <p className="mt-1 text-4xl font-extrabold">{passing}<span className="text-xl text-slate-500"> / {controls.length}</span></p>
           <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full bg-green-500" style={{ width: `${Math.round((passing / controls.length) * 100)}%` }} /></div>
         </div>
         <div className="card p-5 text-sm text-slate-600 md:col-span-2">

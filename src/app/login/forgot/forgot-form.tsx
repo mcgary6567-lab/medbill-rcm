@@ -19,7 +19,7 @@ export function ForgotForm() {
         <span className="label">Work email</span>
         <input name="email" type="email" className="input" autoComplete="username" required />
       </label>
-      <button className="btn w-full justify-center bg-green-600 text-white hover:bg-green-700" disabled={pending}>{pending ? "Sending..." : "Email me a reset link"}</button>
+      <button className="btn w-full justify-center bg-green-700 text-white hover:bg-green-800" disabled={pending}>{pending ? "Sending..." : "Email me a reset link"}</button>
     </form>
   );
 }

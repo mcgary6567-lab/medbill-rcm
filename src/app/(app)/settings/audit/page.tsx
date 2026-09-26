@@ -46,7 +46,7 @@ export default async function AuditPage({ searchParams }: { searchParams: Promis
               {events.map(({ event: e, userName }) => (
                 <tr key={e.id}>
                   <td className="whitespace-nowrap text-xs">{fmtDateTime(e.at)}</td>
-                  <td className="text-sm">{userName ?? <span className="text-slate-400">system</span>}</td>
+                  <td className="text-sm">{userName ?? <span className="text-slate-500">system</span>}</td>
                   <td className="text-sm font-medium">{label(e.action)}</td>
                   <td className="text-xs text-slate-500">{e.entity}{e.entityId ? <span className="block font-mono">{e.entityId.slice(0, 8)}</span> : null}</td>
                   <td className="max-w-md truncate font-mono text-[11px] text-slate-500" title={e.details ? JSON.stringify(e.details) : ""}>{e.details ? JSON.stringify(e.details) : ""}</td>

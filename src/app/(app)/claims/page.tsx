@@ -51,7 +51,7 @@ export default async function ClaimsPage({ searchParams }: { searchParams: Promi
       <Card>
         <form className="mb-3 grid gap-2 md:grid-cols-[1fr_auto_auto_auto_auto_auto]" action="/claims">
           <input name="q" defaultValue={params.q} className="input" placeholder="Claim number, payer claim number, patient or MRN" />
-          <select name="payer" defaultValue={params.payer ?? ""} className="input md:w-44">
+          <select name="payer" aria-label="Payer" defaultValue={params.payer ?? ""} className="input md:w-44">
             <option value="">All payers</option>
             {payers.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
           </select>
@@ -65,7 +65,7 @@ export default async function ClaimsPage({ searchParams }: { searchParams: Promi
         </form>
         <div className="mb-3 flex flex-wrap gap-1">
           {QUICK.map((st) => (
-            <Link key={st.key} href={withParams("/claims", params, { status: st.key || undefined, page: undefined })} className={`rounded-full px-3 py-1 text-xs font-semibold ${(params.status ?? "") === st.key ? "bg-brand-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>
+            <Link key={st.key} href={withParams("/claims", params, { status: st.key || undefined, page: undefined })} className={`rounded-full px-3 py-1 text-xs font-semibold ${(params.status ?? "") === st.key ? "bg-brand-700 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>
               {st.label}
             </Link>
           ))}

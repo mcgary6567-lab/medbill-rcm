@@ -70,8 +70,8 @@ export default async function FollowUpPage({ searchParams }: { searchParams: Pro
                       <td className={`text-right tabular-nums ${r.ageDays > 60 ? "font-semibold text-red-700" : ""}`}>{r.ageDays}</td>
                       <td className="text-right"><Money cents={r.claim.totalCents} /></td>
                       <td className="max-w-xs text-xs">
-                        {r.last ? (r.last.error ? <span className="text-red-700">{r.last.error}</span> : r.last.message) : <span className="text-slate-400">Not asked yet</span>}
-                        {r.last && <div className="text-[10px] text-slate-400">asked {fmtDate(r.last.checkedAt)}</div>}
+                        {r.last ? (r.last.error ? <span className="text-red-700">{r.last.error}</span> : r.last.message) : <span className="text-slate-500">Not asked yet</span>}
+                        {r.last && <div className="text-[10px] text-slate-500">asked {fmtDate(r.last.checkedAt)}</div>}
                       </td>
                       <td><Badge tone={TONE[action] ?? "slate"}>{step?.label ?? (r.last?.error ? "Call the payer" : "Ask the payer")}</Badge></td>
                       <td>

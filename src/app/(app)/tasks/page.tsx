@@ -36,7 +36,7 @@ export default async function TasksPage({ searchParams }: { searchParams: Promis
         <Card className="lg:col-span-2">
           <div className="mb-4 flex flex-wrap gap-1">
             {VIEWS.map((x) => (
-              <Link key={x.key} href={`/tasks?view=${x.key}`} className={`rounded-full px-3 py-1 text-xs font-semibold ${view === x.key ? "bg-brand-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>{x.label}</Link>
+              <Link key={x.key} href={`/tasks?view=${x.key}`} className={`rounded-full px-3 py-1 text-xs font-semibold ${view === x.key ? "bg-brand-700 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>{x.label}</Link>
             ))}
           </div>
           {rows.length === 0 ? (
@@ -58,7 +58,7 @@ export default async function TasksPage({ searchParams }: { searchParams: Promis
                       </button>
                     </form>
                     <div className="min-w-0 flex-1">
-                      <div className={`font-medium ${task.status === "done" ? "text-slate-400 line-through" : ""}`}>
+                      <div className={`font-medium ${task.status === "done" ? "text-slate-500 line-through" : ""}`}>
                         {href ? <Link href={href} className="hover:underline">{task.title}</Link> : task.title}
                       </div>
                       {task.note && <div className="mt-0.5 text-xs text-slate-600">{task.note}</div>}

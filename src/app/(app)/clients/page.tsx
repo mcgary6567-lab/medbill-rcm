@@ -65,7 +65,7 @@ export default async function ClientsPage() {
                       <td className="text-right"><Money cents={k.chargesCents} /></td>
                       <td className="text-right"><Money cents={k.insurancePaidCents + k.patientPaidCents} /></td>
                       <td className="text-right tabular-nums" title={year.netCollectionRate === null ? "No claims older than 30 days yet" : undefined}>
-                        {year.netCollectionRate === null ? <span className="text-slate-400">too new</span> : pct(year.netCollectionRate)}
+                        {year.netCollectionRate === null ? <span className="text-slate-500">too new</span> : pct(year.netCollectionRate)}
                       </td>
                       <td className="text-right tabular-nums">{pct(year.cleanClaimRate)}</td>
                       <td className={`text-right tabular-nums ${year.denialRate > 0.1 ? "font-semibold text-red-700" : ""}`}>{pct(year.denialRate)}</td>
@@ -78,7 +78,7 @@ export default async function ClientsPage() {
                       <td className="text-right tabular-nums">{k.openDenials}</td>
                       <td className="text-right">
                         {p.id === s.practiceId ? (
-                          <span className="text-xs text-slate-400">Current</span>
+                          <span className="text-xs text-slate-500">Current</span>
                         ) : (
                           <form action={switchPracticeAction}>
                             <input type="hidden" name="practiceId" value={p.id} />

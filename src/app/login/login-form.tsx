@@ -16,7 +16,7 @@ export function LoginForm() {
         <span className="label">Password</span>
         <input name="password" type="password" className="input" defaultValue="admin123" autoComplete="current-password" required />
       </label>
-      <button className="btn w-full justify-center bg-green-600 text-white hover:bg-green-700" disabled={pending}>
+      <button className="btn w-full justify-center bg-green-700 text-white hover:bg-green-800" disabled={pending}>
         {pending ? "Signing in..." : "Sign in"}
       </button>
     </form>

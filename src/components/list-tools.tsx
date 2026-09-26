@@ -78,11 +78,11 @@ export function SavedViews({ page, query, views }: { page: string; query: string
   }, [state]);
   return (
     <div className="flex flex-wrap items-center gap-1.5 text-xs">
-      <Bookmark className="h-3.5 w-3.5 text-slate-400" />
+      <Bookmark className="h-3.5 w-3.5 text-slate-500" />
       {views.map((v) => (
         <span key={v.id} className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-2 py-0.5">
           <Link href={`/${page}${v.query ? `?${v.query}` : ""}`} className="font-medium text-brand-700 hover:underline">{v.name}</Link>
-          <button type="button" aria-label={`Delete view ${v.name}`} onClick={() => deleteViewAction(page, v.id)} className="text-slate-400 hover:text-red-600"><X className="h-3 w-3" /></button>
+          <button type="button" aria-label={`Delete view ${v.name}`} onClick={() => deleteViewAction(page, v.id)} className="text-slate-500 hover:text-red-600"><X className="h-3 w-3" /></button>
         </span>
       ))}
       {naming ? (

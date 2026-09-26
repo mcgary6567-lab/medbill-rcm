@@ -125,7 +125,7 @@ export default async function AdminDashboard() {
                   <tr key={p.payer}>
                     <td>
                       <div className="font-medium">{p.payer}</div>
-                      <div className="text-xs capitalize text-slate-400">{p.type}</div>
+                      <div className="text-xs capitalize text-slate-500">{p.type}</div>
                     </td>
                     <td className="text-right tabular-nums">{p.claims.toLocaleString()}</td>
                     <td className="text-right tabular-nums">{compactMoney(p.billedCents)}</td>
@@ -151,7 +151,7 @@ export default async function AdminDashboard() {
                 <tr key={p.name}>
                   <td>
                     <div className="font-medium">{p.name}</div>
-                    <div className="text-xs text-slate-400">{p.specialty}</div>
+                    <div className="text-xs text-slate-500">{p.specialty}</div>
                   </td>
                   <td className="text-right tabular-nums">{p.claims.toLocaleString()}</td>
                   <td className="text-right tabular-nums">{compactMoney(p.billedCents)}</td>

@@ -70,7 +70,7 @@ export default function TrustPage() {
           <ul className="mt-4 space-y-2.5">
             {ASSURANCE.map((a) => (
               <li key={a.text} className="flex gap-2.5 text-sm text-slate-700">
-                {a.done ? <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-green-600" /> : <CircleDashed className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />} {a.text}
+                {a.done ? <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-green-600" /> : <CircleDashed className="mt-0.5 h-4 w-4 shrink-0 text-slate-500" />} {a.text}
               </li>
             ))}
           </ul>

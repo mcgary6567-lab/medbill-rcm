@@ -59,7 +59,8 @@ async function connect(): Promise<Runner> {
 
   // Embedded Postgres (WASM) for local development - no install required.
   const { PGlite } = await import("@electric-sql/pglite");
-  const dataDir = path.join(process.cwd(), "data", "pg");
+  // PGLITE_DIR lets end-to-end tests run against their own throwaway database.
+  const dataDir = process.env.PGLITE_DIR?.trim() || path.join(process.cwd(), "data", "pg");
   fs.mkdirSync(dataDir, { recursive: true });
   const client = new PGlite(dataDir);
   await client.waitReady;

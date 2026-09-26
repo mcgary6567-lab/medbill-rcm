@@ -46,7 +46,7 @@ export function Importer({ fields, maxRows }: { fields: Field[]; maxRows: number
   return (
     <div className="space-y-6">
       <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-300 bg-white p-8 text-center hover:border-brand-500">
-        <Upload className="h-6 w-6 text-slate-400" />
+        <Upload className="h-6 w-6 text-slate-500" />
         <span className="text-sm font-medium">{file ? file.name : "Choose a CSV file exported from your EHR or practice management system"}</span>
         <span className="text-xs text-slate-500">Comma, semicolon, tab or pipe separated, up to {maxRows.toLocaleString()} rows. Save Excel files as CSV first.</span>
         <input type="file" accept=".csv,.txt,.tsv,text/csv" className="sr-only" onChange={(e) => onFile(e.target.files?.[0])} />

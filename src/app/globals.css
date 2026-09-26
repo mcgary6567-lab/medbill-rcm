@@ -6,12 +6,13 @@
   --color-brand-500: #22c55e;
   --color-brand-600: #16a34a;
   --color-brand-700: #15803d;
+  --color-brand-800: #166534;
   --color-brand-900: #14532d;
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 :root {
-  --bg: #f6f8fb;
+  --bg: #f8fafc;
   --surface: #ffffff;
   --border: #e5e9f0;
   --text: #0f172a;
@@ -91,11 +92,11 @@ body {
   transition: background 0.15s;
 }
 .btn-primary {
-  background: var(--color-brand-600);
+  background: var(--color-brand-700);
   color: #fff;
 }
 .btn-primary:hover {
-  background: var(--color-brand-700);
+  background: var(--color-brand-800);
 }
 .btn-secondary {
   background: #fff;

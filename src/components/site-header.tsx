@@ -56,7 +56,7 @@ export function SiteHeader({
 
         <div className="ml-auto flex items-center gap-2 sm:gap-3">
           {signedIn ? (
-            <Link href="/dashboard" className="btn bg-green-600 text-white hover:bg-green-700">
+            <Link href="/dashboard" className="btn bg-green-700 text-white hover:bg-green-800">
               Open dashboard <ArrowRight className="h-4 w-4" />
             </Link>
           ) : (
@@ -67,7 +67,7 @@ export function SiteHeader({
               >
                 Sign in
               </Link>
-              <Link href="/login" className="btn bg-green-600 text-white hover:bg-green-700">
+              <Link href="/login" className="btn bg-green-700 text-white hover:bg-green-800">
                 View the demo <ArrowRight className="h-4 w-4" />
               </Link>
             </>

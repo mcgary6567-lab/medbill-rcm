@@ -65,7 +65,7 @@ export async function LabsSection({ db, practiceId, patientId }: { db: Db; pract
             <div className="grid grid-cols-1 gap-1">
               {LAB_TESTS.map((t) => (
                 <label key={t.code} className="flex items-center gap-2">
-                  <input type="checkbox" name="tests" value={t.code} /> {t.name} <span className="font-mono text-[10px] text-slate-400">{t.cpt}</span>
+                  <input type="checkbox" name="tests" value={t.code} /> {t.name} <span className="font-mono text-[10px] text-slate-500">{t.cpt}</span>
                 </label>
               ))}
             </div>

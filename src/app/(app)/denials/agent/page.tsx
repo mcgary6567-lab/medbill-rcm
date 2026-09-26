@@ -36,7 +36,7 @@ export default async function DenialAgentPage({ searchParams }: { searchParams: 
       />
       <div className="mb-4 flex flex-wrap items-center gap-2 text-sm">
         {(["proposed", "approved", "dismissed"] as const).map((v) => (
-          <Link key={v} href={v === "proposed" ? "/denials/agent" : `/denials/agent?view=${v}`} className={`rounded-full px-3 py-1 font-semibold ${status === v ? "bg-brand-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>
+          <Link key={v} href={v === "proposed" ? "/denials/agent" : `/denials/agent?view=${v}`} className={`rounded-full px-3 py-1 font-semibold ${status === v ? "bg-brand-700 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>
             {v === "proposed" ? "Waiting for review" : v[0].toUpperCase() + v.slice(1)} · {counts[v] ?? 0}
           </Link>
         ))}

@@ -114,7 +114,7 @@ export function CommandPalette({ pages }: { pages: { href: string; label: string
         <div className="fixed inset-0 z-50 flex items-start justify-center bg-slate-900/40 p-4 pt-[12vh]" onClick={close}>
           <div className="w-full max-w-xl overflow-hidden rounded-xl border border-slate-200 bg-white shadow-2xl" onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Search">
             <div className="flex items-center gap-2 border-b border-slate-200 px-4">
-              <Search className="h-4 w-4 text-slate-400" />
+              <Search className="h-4 w-4 text-slate-500" />
               <input
                 ref={input}
                 value={q}
@@ -128,7 +128,7 @@ export function CommandPalette({ pages }: { pages: { href: string; label: string
                 placeholder="Patient name or MRN, claim number, or a page"
                 className="h-12 w-full bg-transparent text-sm outline-none"
               />
-              <kbd className="rounded border border-slate-200 px-1.5 font-mono text-[10px] text-slate-400">Esc</kbd>
+              <kbd className="rounded border border-slate-200 px-1.5 font-mono text-[10px] text-slate-500">Esc</kbd>
             </div>
             <ul className="max-h-80 overflow-y-auto py-2">
               {hits.length === 0 && <li className="px-4 py-3 text-sm text-slate-500">No matches.</li>}
@@ -144,13 +144,13 @@ export function CommandPalette({ pages }: { pages: { href: string; label: string
                     >
                       <Icon className="h-4 w-4 shrink-0 opacity-60" />
                       <span className="truncate">{h.label}</span>
-                      {h.detail && <span className="ml-auto truncate text-xs text-slate-400">{h.detail}</span>}
+                      {h.detail && <span className="ml-auto truncate text-xs text-slate-500">{h.detail}</span>}
                     </button>
                   </li>
                 );
               })}
             </ul>
-            <div className="flex items-center gap-3 border-t border-slate-200 px-4 py-2 text-[11px] text-slate-400">
+            <div className="flex items-center gap-3 border-t border-slate-200 px-4 py-2 text-[11px] text-slate-500">
               <span>↑↓ to move · Enter to open</span>
               <button type="button" className="ml-auto inline-flex items-center gap-1 hover:text-slate-600" onClick={() => { close(); setHelp(true); }}>
                 <Keyboard className="h-3 w-3" /> Shortcuts

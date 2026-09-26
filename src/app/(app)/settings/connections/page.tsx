@@ -46,7 +46,7 @@ export default async function ConnectionsPage() {
           const Icon = st.icon;
           return (
             <a key={i.provider} href={`#${i.provider}`} className="card flex items-center gap-3 p-3 transition-shadow hover:shadow-md">
-              <Icon className={`h-5 w-5 shrink-0 ${i.connected ? "text-green-600" : "text-slate-400"}`} />
+              <Icon className={`h-5 w-5 shrink-0 ${i.connected ? "text-green-600" : "text-slate-500"}`} />
               <div className="min-w-0">
                 <div className="truncate text-sm font-semibold">{i.def.name}</div>
                 <div className="truncate text-xs text-slate-500">{i.def.category}</div>

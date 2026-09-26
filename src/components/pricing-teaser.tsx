@@ -52,7 +52,7 @@ export function PricingTeaser() {
               }`}
             >
               {tier.featured && (
-                <span className="absolute -top-3 left-7 rounded-full bg-green-600 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-white">
+                <span className="absolute -top-3 left-7 rounded-full bg-green-700 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-white">
                   Recommended
                 </span>
               )}
@@ -101,7 +101,7 @@ export function PricingTeaser() {
               <details open={tier.featured} className="group/d mt-6 border-t border-slate-100 pt-4">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-1 text-sm font-semibold text-slate-700 transition-colors hover:text-green-700 [&::-webkit-details-marker]:hidden">
                   What&apos;s included
-                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition-colors group-open/d:bg-green-600 group-open/d:text-white">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition-colors group-open/d:bg-green-700 group-open/d:text-white">
                     <ChevronDown className="h-3.5 w-3.5 transition-transform duration-200 group-open/d:rotate-180" />
                   </span>
                 </summary>
@@ -119,7 +119,7 @@ export function PricingTeaser() {
         </div>
 
         <div className="mt-12 text-center">
-          <Link href="/pricing" className="btn bg-green-600 px-6 py-3 text-base text-white hover:bg-green-700">
+          <Link href="/pricing" className="btn bg-green-700 px-6 py-3 text-base text-white hover:bg-green-800">
             Compare every feature <ArrowRight className="h-4 w-4" />
           </Link>
         </div>

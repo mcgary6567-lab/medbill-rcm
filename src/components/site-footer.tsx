@@ -101,7 +101,7 @@ export function SiteFooter() {
             </p>
           </div>
           <div className="flex flex-wrap gap-3 sm:ml-auto sm:shrink-0">
-            <Link href="/login" className="btn bg-green-600 text-white hover:bg-green-700">
+            <Link href="/login" className="btn bg-green-700 text-white hover:bg-green-800">
               Open the demo <ArrowRight className="h-4 w-4" />
             </Link>
             <Link href="/contact" className="btn btn-secondary">
@@ -155,7 +155,7 @@ export function SiteFooter() {
                   target="_blank"
                   rel="noreferrer noopener"
                   aria-label={label}
-                  className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 transition-colors hover:border-green-600 hover:bg-green-600 hover:text-white"
+                  className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 transition-colors hover:border-green-600 hover:bg-green-700 hover:text-white"
                 >
                   <Icon />
                 </a>

@@ -32,9 +32,9 @@ export default async function MenuPage() {
                       <label className="flex items-center gap-2">
                         <input type="checkbox" name="show" value={i.href} defaultChecked={fixed || !hidden.has(i.href)} disabled={fixed} />
                         {fixed && <input type="hidden" name="show" value={i.href} />}
-                        <i.icon className="h-4 w-4 text-slate-400" />
+                        <i.icon className="h-4 w-4 text-slate-500" />
                         <span className={fixed ? "text-slate-500" : ""}>{i.label}</span>
-                        {i.adminOnly && <span className="text-[10px] uppercase text-slate-400">admin</span>}
+                        {i.adminOnly && <span className="text-[10px] uppercase text-slate-500">admin</span>}
                       </label>
                     </li>
                   );

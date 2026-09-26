@@ -48,7 +48,7 @@ export default async function DenialsPage({ searchParams }: { searchParams: Prom
       </div>
       <div className="mb-4 flex flex-wrap items-center gap-2">
         {FILTERS.map((f) => (
-          <Link key={f} href={f ? withParams("/denials", { q: sp.q }, { status: f }) : `/denials?status=${sp.q ? `&q=${encodeURIComponent(sp.q)}` : ""}`} className={`rounded-full px-3 py-1 text-xs font-semibold ${status === f ? "bg-brand-600 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>
+          <Link key={f} href={f ? withParams("/denials", { q: sp.q }, { status: f }) : `/denials?status=${sp.q ? `&q=${encodeURIComponent(sp.q)}` : ""}`} className={`rounded-full px-3 py-1 text-xs font-semibold ${status === f ? "bg-brand-700 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>
             {f ? f.replace(/_/g, " ") : "All"}
           </Link>
         ))}

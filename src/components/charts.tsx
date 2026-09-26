@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Legend, Line, ComposedChart,
+  Area, Bar, BarChart, CartesianGrid, Cell, Legend, Line, ComposedChart,
   Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from "recharts";
 

@@ -200,7 +200,7 @@ export default async function InvestorsPage() {
             the moment the claim is created and makes the money trail auditable end to end.
           </p>
           <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link href="/contact?topic=investor" className="btn bg-green-600 px-6 py-3 text-base text-white hover:bg-green-700">
+            <Link href="/contact?topic=investor" className="btn bg-green-700 px-6 py-3 text-base text-white hover:bg-green-800">
               Request the data room <ArrowRight className="h-4 w-4" />
             </Link>
             <Link href="/login" className="btn btn-secondary px-6 py-3 text-base">
@@ -362,7 +362,7 @@ export default async function InvestorsPage() {
               className="group rounded-2xl border border-slate-200 bg-white p-7 transition-shadow hover:shadow-lg hover:shadow-slate-900/5"
             >
               <div className="flex items-center gap-4">
-                <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-green-50 text-green-600 transition-colors group-hover:bg-green-600 group-hover:text-white">
+                <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-green-50 text-green-600 transition-colors group-hover:bg-green-700 group-hover:text-white">
                   <Icon className="h-5 w-5" />
                 </span>
                 <div>
@@ -641,7 +641,7 @@ export default async function InvestorsPage() {
                       className="h-14 w-14 rounded-full object-cover"
                     />
                   ) : (
-                    <span className="flex h-14 w-14 items-center justify-center rounded-full bg-green-600 text-lg font-bold text-white">
+                    <span className="flex h-14 w-14 items-center justify-center rounded-full bg-green-700 text-lg font-bold text-white">
                       {person.name.split(" ").map((w) => w[0]).slice(0, 2).join("")}
                     </span>
                   )}

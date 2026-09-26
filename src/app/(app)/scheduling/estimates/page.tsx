@@ -50,7 +50,7 @@ export default async function PreVisitEstimatesPage() {
                         <Money cents={r.estimate.patientOwesCents} className="font-semibold" />
                         <span className="block text-xs text-slate-500">{r.estimate.lines.map((l) => l.cpt).join(", ")}{r.estimate.depositRequestedAt ? " · sent" : ""}</span>
                       </>
-                    ) : <span className="text-slate-400">-</span>}
+                    ) : <span className="text-slate-500">-</span>}
                   </td>
                   <td className="text-right">
                     {canWrite && (

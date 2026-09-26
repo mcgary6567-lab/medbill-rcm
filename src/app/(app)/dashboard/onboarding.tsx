@@ -28,7 +28,7 @@ export async function OnboardingGuide({ practiceId }: { practiceId: string }) {
         {checks.map((c, i) => (
           <li key={c.key} className="flex items-center gap-3 text-sm">
             <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold ${c.state === "ok" ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-600"}`}>{c.state === "ok" ? "✓" : i + 1}</span>
-            {c.state === "ok" ? <span className="text-slate-400 line-through">{c.action}</span> : <Link href={c.href} className="font-medium text-brand-700 hover:underline">{c.action}</Link>}
+            {c.state === "ok" ? <span className="text-slate-500 line-through">{c.action}</span> : <Link href={c.href} className="font-medium text-brand-700 hover:underline">{c.action}</Link>}
           </li>
         ))}
       </ol>

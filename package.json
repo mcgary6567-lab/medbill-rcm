@@ -7,8 +7,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit --noUnusedLocals",
     "test": "vitest run",
+    "e2e": "playwright test",
     "build:migrations": "node scripts/build-migrations.mjs",
     "seed:large": "tsx scripts/seed-large.ts",
     "import:code-sets": "tsx --tsconfig tsconfig.scripts.json scripts/import-code-sets.ts",
@@ -34,6 +35,8 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^26.6.2",
     "@types/pg": "^8.23.1",

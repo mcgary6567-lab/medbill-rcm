@@ -33,7 +33,7 @@ export default async function SetupPage() {
             {st.done ? <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-green-600" /> : <Circle className="mt-0.5 h-5 w-5 shrink-0 text-slate-300" />}
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2 font-semibold">
-                <span className="text-xs text-slate-400">{i + 1}.</span> {st.title}
+                <span className="text-xs text-slate-500">{i + 1}.</span> {st.title}
                 {st.optional && <Badge>Optional</Badge>}
               </div>
               <p className="text-sm text-slate-600">{st.detail}</p>

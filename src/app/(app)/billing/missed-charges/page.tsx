@@ -43,7 +43,7 @@ export default async function MissedChargesPage() {
                   <td><PatientLink id={r.patientId} {...name(r.patientName)} /></td>
                   <td>{r.providerName}</td>
                   <td className="text-sm text-slate-600">{r.detail}</td>
-                  <td className="text-right">{r.estimateCents ? <Money cents={r.estimateCents} /> : <span className="text-slate-400">n/a</span>}</td>
+                  <td className="text-right">{r.estimateCents ? <Money cents={r.estimateCents} /> : <span className="text-slate-500">n/a</span>}</td>
                   <td className="whitespace-nowrap text-right">
                     {canWrite && (
                       <div className="flex items-start justify-end gap-2">

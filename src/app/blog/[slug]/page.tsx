@@ -146,7 +146,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             </h1>
             <p className="mt-5 text-lg leading-relaxed text-slate-600">{post.excerpt}</p>
             <div className="mt-7 flex items-center gap-4 border-t border-slate-200 pt-6 text-sm">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-600 font-bold text-white">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-700 font-bold text-white">
                 {post.author.charAt(0)}
               </div>
               <div>

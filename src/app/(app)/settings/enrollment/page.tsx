@@ -91,7 +91,7 @@ export default async function EnrollmentPage({ searchParams }: { searchParams: P
                       const e = grid.get(pr.id, pa.id);
                       return (
                         <td key={pa.id}>
-                          <a href={cell(pr.id, pa.id)} className={`badge ${TONE[e?.status ?? "none"] ?? "bg-white text-slate-400 ring-1 ring-slate-200"} hover:opacity-80`}>
+                          <a href={cell(pr.id, pa.id)} className={`badge ${TONE[e?.status ?? "none"] ?? "bg-white text-slate-500 ring-1 ring-slate-200"} hover:opacity-80`}>
                             {e ? e.status.replace(/_/g, " ") : "not tracked"}
                           </a>
                           {e?.revalidationDue && <div className="mt-1 text-[11px] text-slate-500">reval {e.revalidationDue}</div>}

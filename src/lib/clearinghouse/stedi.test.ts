@@ -4,8 +4,8 @@ import { build277CA } from "@/lib/edi/x277ca";
 import { summarize271 } from "@/lib/edi/x270";
 
 function stub(status: number, body: unknown) {
-  const calls: { url: string; init: { method: string; headers: Record<string, string>; body: string } }[] = [];
-  const http = async (url: string, init: { method: string; headers: Record<string, string>; body: string }) => {
+  const calls: { url: string; init: { method: string; headers: Record<string, string>; body?: string } }[] = [];
+  const http = async (url: string, init: { method: string; headers: Record<string, string>; body?: string }) => {
     calls.push({ url, init });
     return { ok: status < 300, status, json: async () => body, text: async () => JSON.stringify(body) };
   };
@@ -25,7 +25,7 @@ describe("Stedi adapter", () => {
     const r = await new StediClearinghouse("test_key_123", http).submit837("ISA*...~", { controlNumber: "CMD000001", memberId: "A1" });
     expect(calls[0].url).toBe("https://healthcare.us.stedi.com/2024-04-01/change/medicalnetwork/professionalclaims/v3/raw-x12-submission");
     expect(calls[0].init.headers).toMatchObject({ Authorization: "test_key_123", "Idempotency-Key": "claim-CMD000001" });
-    expect(JSON.parse(calls[0].init.body)).toEqual({ x12: "ISA*...~" });
+    expect(JSON.parse(calls[0].init.body ?? "")).toEqual({ x12: "ISA*...~" });
     expect(r).toMatchObject({ accepted: true, status: "accepted", clearinghouseId: "01ABC" });
   });
 

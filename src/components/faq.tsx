@@ -26,7 +26,7 @@ export function Faq({
             className="flex cursor-pointer list-none items-center justify-between gap-6 px-6 py-5 transition-colors hover:bg-slate-50 [&::-webkit-details-marker]:hidden"
           >
             <h3 className="text-base font-bold text-slate-900 group-open:text-green-700">{q}</h3>
-            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition-colors group-open:bg-green-600 group-open:text-white">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition-colors group-open:bg-green-700 group-open:text-white">
               <ChevronDown className="h-4 w-4 transition-transform duration-200 group-open:rotate-180" />
             </span>
           </summary>

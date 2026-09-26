@@ -44,7 +44,7 @@ export function Kpi({
       </div>
       <div className={cn("mt-1.5 text-2xl font-bold tabular-nums leading-none", TONE_TEXT[tone])}>{value}</div>
       {hint && <div className="mt-1.5 text-xs text-slate-500">{hint}</div>}
-      {target && <div className="mt-0.5 text-[11px] text-slate-400">{target}</div>}
+      {target && <div className="mt-0.5 text-[11px] text-slate-500">{target}</div>}
     </div>
   );
 }

@@ -40,7 +40,7 @@ function NavLinks({ role, multi, hidden, onNavigate }: { role: string; multi: bo
     <nav className="flex-1 space-y-4 overflow-y-auto px-3 pb-4">
       {visible.map((g) => (
         <div key={g.title}>
-          <div className="px-3 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">{g.title}</div>
+          <div className="px-3 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">{g.title}</div>
           <div className="space-y-0.5">
             {g.items.map(({ href, label, icon: Icon }) => (
               <Link
@@ -106,7 +106,7 @@ export function Sidebar({
       <Link href="/tasks" className="relative rounded-lg p-2 text-slate-500 hover:bg-slate-100" title={`${tasks.open} open tasks, ${tasks.due} due`} aria-label={`Tasks: ${tasks.open} open, ${tasks.due} due`}>
         <CheckSquare className="h-4 w-4" />
         {tasks.open > 0 && (
-          <span className={`absolute -right-0.5 -top-0.5 min-w-[1.1rem] rounded-full px-1 text-center text-[10px] font-bold leading-[1.1rem] text-white ${tasks.due > 0 ? "bg-red-600" : "bg-brand-600"}`}>
+          <span className={`absolute -right-0.5 -top-0.5 min-w-[1.1rem] rounded-full px-1 text-center text-[10px] font-bold leading-[1.1rem] text-white ${tasks.due > 0 ? "bg-red-600" : "bg-brand-700"}`}>
             {tasks.open > 99 ? "99+" : tasks.open}
           </span>
         )}

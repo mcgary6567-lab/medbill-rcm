@@ -1410,3 +1410,10 @@ export type Remittance = typeof remittances.$inferSelect;
 export type LedgerEntry = typeof ledgerEntries.$inferSelect;
 export type Denial = typeof denials.$inferSelect;
 export type ScrubResult = Claim["scrubResults"][number];
+
+/* Attempt counters per hashed caller address. See migration 0035 and server/throttle.ts. */
+export const authThrottle = pgTable("auth_throttle", {
+  key: text("key").primaryKey(),
+  windowStart: timestamp("window_start", { withTimezone: true }).defaultNow().notNull(),
+  count: integer("count").default(0).notNull(),
+});

@@ -50,7 +50,7 @@ export default function SwitchPage() {
         <ol className="space-y-6 lg:col-span-2">
           {STEPS.map((s, i) => (
             <li key={s.title} className="flex gap-4">
-              <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-600 text-sm font-bold text-white">{i + 1}</span>
+              <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-700 text-sm font-bold text-white">{i + 1}</span>
               <div>
                 <h2 className="font-bold text-slate-900">{s.title}</h2>
                 <p className="mt-1 text-sm leading-relaxed text-slate-700">{s.body}</p>
@@ -67,7 +67,7 @@ export default function SwitchPage() {
             <h2 className="font-bold text-slate-900">See it first</h2>
             <p className="mt-2 text-sm text-slate-700">Every step above can be tried in the demo, which runs on a full-size synthetic practice.</p>
             <div className="mt-4 flex flex-wrap gap-2">
-              <Link href="/login" className="btn bg-green-600 text-white hover:bg-green-700">Open the demo</Link>
+              <Link href="/login" className="btn bg-green-700 text-white hover:bg-green-800">Open the demo</Link>
               <Link href="/contact" className="btn btn-secondary">Plan a switch with us</Link>
             </div>
           </div>

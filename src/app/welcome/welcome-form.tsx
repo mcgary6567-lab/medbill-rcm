@@ -16,7 +16,7 @@ export function WelcomeForm({ token }: { token: string }) {
         <span className="label">Again</span>
         <input name="confirm" type="password" minLength={12} autoComplete="new-password" className="input" required />
       </label>
-      <button className="btn w-full justify-center bg-green-600 text-white hover:bg-green-700" disabled={pending}>{pending ? "Saving..." : "Set password"}</button>
+      <button className="btn w-full justify-center bg-green-700 text-white hover:bg-green-800" disabled={pending}>{pending ? "Saving..." : "Set password"}</button>
     </form>
   );
 }

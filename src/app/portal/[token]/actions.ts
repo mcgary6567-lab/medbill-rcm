@@ -1,6 +1,9 @@
 "use server";
 
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { clientIp } from "@/lib/ip";
+import { hit, waitMessage } from "@/server/throttle";
 import { getDb } from "@/db";
 import type { FormResult } from "@/components/action-form";
 import { grantPortal, portalVerifiedFor } from "@/lib/portal-session";
@@ -16,6 +19,8 @@ async function verifiedLink(token: string) {
 
 export async function verifyPortalAction(token: string, _prev: FormResult, formData: FormData): Promise<FormResult> {
   const db = await getDb();
+  const t = await hit(db, "portal", clientIp(await headers()));
+  if (!t.ok) return { ok: false, message: waitMessage(t.retryAfterSec) };
   const r = await verifyPortalDob(db, token, String(formData.get("dob") ?? ""));
   if (!r.ok) return { ok: false, message: r.message };
   await grantPortal(r.linkId);

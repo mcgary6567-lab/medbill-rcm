@@ -12,7 +12,7 @@ export function SettingsNav({ sections }: { sections: { title: string; links: Se
     <nav aria-label="Settings" className="sticky top-6 space-y-5 text-sm">
       {sections.map((s) => (
         <div key={s.title}>
-          <p className="mb-1 px-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">{s.title}</p>
+          <p className="mb-1 px-2 text-[11px] font-bold uppercase tracking-wider text-slate-500">{s.title}</p>
           <ul className="space-y-0.5">
             {s.links.map((l) => (
               <li key={l.href}>

@@ -105,11 +105,11 @@ export function ChargeEntryForm({
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {dx.map((d, i) => (
             <div key={i} className="flex items-center gap-2">
-              <span className="w-5 text-xs font-semibold text-slate-400">{i + 1}</span>
+              <span className="w-5 text-xs font-semibold text-slate-500">{i + 1}</span>
               <input list="icd-list" className="input font-mono" placeholder="e.g. E11.9" value={d} onChange={(e) => setDx((arr) => arr.map((x, j) => (j === i ? e.target.value.toUpperCase() : x)))} />
               <span className="hidden min-w-0 flex-1 truncate text-xs text-slate-500 lg:inline">{icds.find((c) => c.code === d)?.description}</span>
               {dx.length > 1 && (
-                <button type="button" className="text-slate-400 hover:text-red-600" onClick={() => setDx((arr) => arr.filter((_, j) => j !== i))}>
+                <button type="button" className="text-slate-500 hover:text-red-600" onClick={() => setDx((arr) => arr.filter((_, j) => j !== i))}>
                   <Trash2 className="h-4 w-4" />
                 </button>
               )}
@@ -137,7 +137,7 @@ export function ChargeEntryForm({
           <tbody>
             {lines.map((l, i) => (
               <tr key={i}>
-                <td className="text-slate-400">{i + 1}</td>
+                <td className="text-slate-500">{i + 1}</td>
                 <td className="w-32">
                   <input list="cpt-list" className="input font-mono" value={l.cpt} onChange={(e) => {
                     const code = e.target.value.toUpperCase();
@@ -152,7 +152,7 @@ export function ChargeEntryForm({
                 <td className="w-24"><input className="input" value={l.dxPointers} onChange={(e) => updateLine(i, { dxPointers: e.target.value })} /></td>
                 <td>
                   {lines.length > 1 && (
-                    <button type="button" className="text-slate-400 hover:text-red-600" onClick={() => setLines((ls) => ls.filter((_, j) => j !== i))}>
+                    <button type="button" className="text-slate-500 hover:text-red-600" onClick={() => setLines((ls) => ls.filter((_, j) => j !== i))}>
                       <Trash2 className="h-4 w-4" />
                     </button>
                   )}

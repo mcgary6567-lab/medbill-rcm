@@ -58,7 +58,7 @@ export function UnsubscribeForm() {
         />
       </label>
       <button
-        className="btn w-full justify-center bg-green-600 py-2.5 text-white hover:bg-green-700"
+        className="btn w-full justify-center bg-green-700 py-2.5 text-white hover:bg-green-800"
         disabled={pending}
       >
         {pending ? "Removing..." : "Unsubscribe"}

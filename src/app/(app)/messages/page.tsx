@@ -43,10 +43,10 @@ export default async function MessagesPage({ searchParams }: { searchParams: Pro
                   <Link href={`/messages?phone=${encodeURIComponent(t.phone)}`} className={`block rounded-lg px-2 py-2 hover:bg-slate-50 ${active?.phone === t.phone ? "bg-brand-50" : ""}`}>
                     <div className="flex items-center justify-between gap-2">
                       <span className={`truncate text-sm ${t.unread ? "font-bold text-slate-900" : "font-medium text-slate-800"}`}>{t.patientName ?? pretty(t.phone)}</span>
-                      {t.unread > 0 && <span className="rounded-full bg-brand-600 px-2 text-xs font-bold text-white">{t.unread}</span>}
+                      {t.unread > 0 && <span className="rounded-full bg-brand-700 px-2 text-xs font-bold text-white">{t.unread}</span>}
                     </div>
                     <p className="truncate text-xs text-slate-500">{t.lastDirection === "out" ? "You: " : ""}{t.lastBody}</p>
-                    <p className="text-[11px] text-slate-400">{fmtDateTime(t.lastAt)}{t.optedOut ? " · opted out" : ""}</p>
+                    <p className="text-[11px] text-slate-500">{fmtDateTime(t.lastAt)}{t.optedOut ? " · opted out" : ""}</p>
                   </Link>
                 </li>
               ))}
@@ -77,9 +77,9 @@ export default async function MessagesPage({ searchParams }: { searchParams: Pro
               <div className="max-h-[28rem] space-y-2 overflow-y-auto rounded-lg bg-slate-50 p-3">
                 {active.messages.map((m) => (
                   <div key={m.id} className={`flex ${m.direction === "out" ? "justify-end" : "justify-start"}`}>
-                    <div className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm ${m.direction === "out" ? "bg-brand-600 text-white" : "bg-white text-slate-900 ring-1 ring-slate-200"}`}>
+                    <div className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm ${m.direction === "out" ? "bg-brand-700 text-white" : "bg-white text-slate-900 ring-1 ring-slate-200"}`}>
                       <p className="whitespace-pre-wrap break-words">{m.body}</p>
-                      <p className={`mt-1 text-[10px] ${m.direction === "out" ? "text-brand-100" : "text-slate-400"}`}>{fmtDateTime(m.createdAt)}{m.status === "failed" ? " · not delivered" : ""}</p>
+                      <p className={`mt-1 text-[10px] ${m.direction === "out" ? "text-brand-100" : "text-slate-500"}`}>{fmtDateTime(m.createdAt)}{m.status === "failed" ? " · not delivered" : ""}</p>
                     </div>
                   </div>
                 ))}

@@ -359,9 +359,9 @@ export default async function ClaimPage({ params }: { params: Promise<{ id: stri
             <ol className="space-y-3 text-sm">
               {events.map((e) => (
                 <li key={e.id} className="border-l-2 border-slate-200 pl-3">
-                  <div className="flex items-center gap-2"><StatusBadge status={e.status} /><span className="text-xs text-slate-400">{e.source}</span></div>
+                  <div className="flex items-center gap-2"><StatusBadge status={e.status} /><span className="text-xs text-slate-500">{e.source}</span></div>
                   <div className="text-slate-700">{e.message}</div>
-                  <div className="text-xs text-slate-400">{fmtDateTime(e.at)}</div>
+                  <div className="text-xs text-slate-500">{fmtDateTime(e.at)}</div>
                 </li>
               ))}
             </ol>

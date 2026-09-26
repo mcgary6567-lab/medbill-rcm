@@ -36,7 +36,7 @@ export default async function AccountingPage({ searchParams }: { searchParams: P
       <PageHeader title="Accounting" subtitle="The month's billing activity as a journal entry for your books, and month-end close" actions={<Link href="/reports" className="btn btn-secondary">Reports</Link>} />
       <div className="mb-4 flex flex-wrap gap-2">
         {months.map((m) => (
-          <Link key={m} href={`/billing/accounting?period=${m}`} className={`rounded-lg px-3 py-1.5 text-sm font-semibold ${m === period ? "bg-brand-600 text-white" : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50"}`}>{m}</Link>
+          <Link key={m} href={`/billing/accounting?period=${m}`} className={`rounded-lg px-3 py-1.5 text-sm font-semibold ${m === period ? "bg-brand-700 text-white" : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50"}`}>{m}</Link>
         ))}
       </div>
       <div className="grid gap-6 lg:grid-cols-3">

@@ -67,7 +67,7 @@ export async function WorkPanel({ db, practiceId, entityType, entityId, defaultT
             {notes.map(({ note, author }) => (
               <li key={note.id}>
                 <div className="whitespace-pre-wrap text-slate-800">{note.body}</div>
-                <div className="text-[11px] text-slate-400">{author ?? "Someone"} · {fmtDateTime(note.createdAt)}</div>
+                <div className="text-[11px] text-slate-500">{author ?? "Someone"} · {fmtDateTime(note.createdAt)}</div>
               </li>
             ))}
           </ol>

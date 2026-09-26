@@ -67,9 +67,9 @@ export default async function UserDashboard() {
               { label: "Best month", value: money.bestMonth ? compactMoney(money.bestMonth.amount) : "-", sub: money.bestMonth?.month },
             ].map((m) => (
               <div key={m.label}>
-                <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">{m.label}</div>
+                <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">{m.label}</div>
                 <div className="mt-0.5 text-base font-bold tabular-nums text-slate-900">{m.value}</div>
-                {m.sub && <div className="text-[11px] text-slate-400">{m.sub}</div>}
+                {m.sub && <div className="text-[11px] text-slate-500">{m.sub}</div>}
               </div>
             ))}
           </div>
@@ -191,7 +191,7 @@ export default async function UserDashboard() {
                   <tr key={d.id}>
                     <td>
                       <Link href={`/claims/${d.claimId}`} className="font-mono text-brand-700 hover:underline">{d.controlNumber}</Link>
-                      <div className="text-xs capitalize text-slate-400">{d.category.replace(/_/g, " ")}</div>
+                      <div className="text-xs capitalize text-slate-500">{d.category.replace(/_/g, " ")}</div>
                     </td>
                     <td>{d.patient}</td>
                     <td className="text-slate-600">{d.payer}</td>
@@ -265,7 +265,7 @@ export default async function UserDashboard() {
               <span className="flex-1">Post remittances</span>
             </Link>
           </div>
-          <p className="mt-3 text-xs text-slate-400">Updated {fmtDate(new Date())}</p>
+          <p className="mt-3 text-xs text-slate-500">Updated {fmtDate(new Date())}</p>
         </Card>
       </div>
     </>

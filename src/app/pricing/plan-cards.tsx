@@ -90,7 +90,7 @@ export function PlanCards() {
               onClick={() => setCycle(c)}
               className={`rounded-full px-5 py-2 text-sm font-semibold transition-colors ${
                 cycle === c
-                  ? "bg-green-600 text-white"
+                  ? "bg-green-700 text-white"
                   : "text-slate-600 hover:text-slate-900"
               }`}
             >
@@ -119,7 +119,7 @@ export function PlanCards() {
             }`}
           >
             {tier.featured && (
-              <span className="absolute -top-3 left-7 rounded-full bg-green-600 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-white">
+              <span className="absolute -top-3 left-7 rounded-full bg-green-700 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-white">
                 Recommended
               </span>
             )}
@@ -136,7 +136,7 @@ export function PlanCards() {
             <Link
               href="/contact"
               className={`btn mt-6 w-full justify-center py-2.5 ${
-                tier.featured ? "bg-green-600 text-white hover:bg-green-700" : "btn-secondary"
+                tier.featured ? "bg-green-700 text-white hover:bg-green-800" : "btn-secondary"
               }`}
             >
               {tier.cta} <ArrowRight className="h-4 w-4" />

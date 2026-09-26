@@ -41,7 +41,7 @@ export default async function CheckInsPage() {
                       <ul className="mt-1 space-y-1">
                         {changes.map((ch) => (
                           <li key={ch.field}>
-                            <span className="text-slate-500">{ch.label}:</span> <span className="text-slate-400 line-through">{ch.from || "blank"}</span> → <span className="font-medium">{ch.to}</span>
+                            <span className="text-slate-500">{ch.label}:</span> <span className="text-slate-500 line-through">{ch.from || "blank"}</span> → <span className="font-medium">{ch.to}</span>
                           </li>
                         ))}
                       </ul>

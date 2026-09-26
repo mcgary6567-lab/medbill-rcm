@@ -21,7 +21,7 @@ export function VerifyForm() {
           placeholder="123456"
         />
       </label>
-      <button className="btn w-full justify-center bg-green-600 text-white hover:bg-green-700" disabled={pending}>
+      <button className="btn w-full justify-center bg-green-700 text-white hover:bg-green-800" disabled={pending}>
         {pending ? "Checking..." : "Verify and sign in"}
       </button>
       <a href="/login" className="block text-center text-xs text-slate-500 hover:underline">Start over</a>

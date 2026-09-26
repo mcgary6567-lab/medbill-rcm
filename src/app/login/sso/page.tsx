@@ -21,7 +21,7 @@ export default async function SsoLoginPage({ searchParams }: { searchParams: Pro
               <span className="label">Work email</span>
               <input name="email" type="email" className="input" autoComplete="username" required />
             </label>
-            <button className="btn w-full justify-center bg-green-600 text-white hover:bg-green-700">Continue</button>
+            <button className="btn w-full justify-center bg-green-700 text-white hover:bg-green-800">Continue</button>
           </form>
           <p className="mt-4 text-center text-sm"><Link href="/login" className="text-brand-700 hover:underline">Sign in with a password instead</Link></p>
         </div>

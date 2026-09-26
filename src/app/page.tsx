@@ -247,7 +247,7 @@ export default async function LandingPage() {
               match deposits, recover what was missed or underpaid, forecast cash and let patients pay from their phone.
             </p>
             <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Link href="/login" className="btn bg-green-600 px-6 py-3 text-base text-white hover:bg-green-700">
+              <Link href="/login" className="btn bg-green-700 px-6 py-3 text-base text-white hover:bg-green-800">
                 Explore the live demo <ArrowRight className="h-4 w-4" />
               </Link>
               <a href="#calculator" className="btn btn-secondary px-6 py-3 text-base">
@@ -412,7 +412,7 @@ export default async function LandingPage() {
             {WORKFLOW.map(({ icon: Icon, title, body }, i) => (
               <li key={title} className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 transition-shadow hover:shadow-lg hover:shadow-slate-900/5">
                 <span aria-hidden className="absolute -right-2 -top-4 font-mono text-7xl font-black text-slate-100 transition-colors group-hover:text-green-50">{String(i + 1).padStart(2, "0")}</span>
-                <span className="relative inline-flex h-11 w-11 items-center justify-center rounded-xl bg-slate-900 text-white transition-colors group-hover:bg-green-600">
+                <span className="relative inline-flex h-11 w-11 items-center justify-center rounded-xl bg-slate-900 text-white transition-colors group-hover:bg-green-700">
                   <Icon className="h-5 w-5" />
                 </span>
                 <h3 className="relative mt-4 text-base font-bold text-slate-900">{title}</h3>
@@ -447,7 +447,7 @@ export default async function LandingPage() {
               A dashboard that reports 51 days in A/R without saying whether that is good is just trivia. Every headline
               metric is shown against the industry target and colored accordingly. With email connected, a summary arrives every Monday.
             </p>
-            <Link href="/login" className="btn mt-8 bg-green-600 px-6 py-3 text-base text-white hover:bg-green-700">
+            <Link href="/login" className="btn mt-8 bg-green-700 px-6 py-3 text-base text-white hover:bg-green-800">
               See it on a full-size demo practice <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -506,12 +506,12 @@ export default async function LandingPage() {
                 ))}
               </ul>
               <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Connects to, with your own account, from one settings screen</p>
+                <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Connects to, with your own account, from one settings screen</p>
                 <ul className="mt-3 grid gap-2 sm:grid-cols-2">
                   {CONNECTS.map((c) => (
                     <li key={c.name} className="rounded-xl border border-white/10 px-4 py-3">
                       <div className="text-sm font-semibold text-white">{c.name}</div>
-                      <div className="text-xs text-slate-400">{c.what}</div>
+                      <div className="text-xs text-slate-500">{c.what}</div>
                     </li>
                   ))}
                 </ul>

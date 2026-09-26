@@ -55,7 +55,7 @@ export default async function UnderpaymentsPage({ searchParams }: { searchParams
           <Link
             key={t.status}
             href={`/underpayments?status=${t.status}`}
-            className={`rounded-lg px-3 py-1.5 text-sm font-semibold ${t.status === status ? "bg-brand-600 text-white" : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50"}`}
+            className={`rounded-lg px-3 py-1.5 text-sm font-semibold ${t.status === status ? "bg-brand-700 text-white" : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50"}`}
           >
             {t.label}
           </Link>

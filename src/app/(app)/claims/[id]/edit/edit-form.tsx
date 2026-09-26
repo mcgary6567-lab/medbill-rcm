@@ -69,9 +69,9 @@ export function ClaimEditForm({
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {dx.map((d, i) => (
             <div key={i} className="flex items-center gap-2">
-              <span className="w-5 text-xs font-semibold text-slate-400">{i + 1}</span>
+              <span className="w-5 text-xs font-semibold text-slate-500">{i + 1}</span>
               <input list="icd-edit" className="input font-mono" value={d} onChange={(e) => setDx((a) => a.map((x, j) => (j === i ? e.target.value.toUpperCase() : x)))} />
-              {dx.length > 1 && <button type="button" aria-label="Remove diagnosis" className="text-slate-400 hover:text-red-600" onClick={() => setDx((a) => a.filter((_, j) => j !== i))}><Trash2 className="h-4 w-4" /></button>}
+              {dx.length > 1 && <button type="button" aria-label="Remove diagnosis" className="text-slate-500 hover:text-red-600" onClick={() => setDx((a) => a.filter((_, j) => j !== i))}><Trash2 className="h-4 w-4" /></button>}
             </div>
           ))}
         </div>
@@ -89,7 +89,7 @@ export function ClaimEditForm({
             <tbody>
               {lines.map((l, i) => (
                 <tr key={i}>
-                  <td className="text-slate-400">{i + 1}</td>
+                  <td className="text-slate-500">{i + 1}</td>
                   <td className="w-32">
                     <input list="cpt-edit" className="input font-mono" value={l.cpt} onChange={(e) => {
                       const code = e.target.value.toUpperCase();
@@ -101,7 +101,7 @@ export function ClaimEditForm({
                   <td className="w-20"><input type="number" min={1} className="input" value={l.units} onChange={(e) => update(i, { units: Number(e.target.value) })} /></td>
                   <td className="w-28"><input type="number" step="0.01" min={0} className="input" value={l.charge} onChange={(e) => update(i, { charge: e.target.value })} /></td>
                   <td className="w-24"><input className="input" value={l.dxPointers} onChange={(e) => update(i, { dxPointers: e.target.value })} /></td>
-                  <td>{lines.length > 1 && <button type="button" aria-label="Remove line" className="text-slate-400 hover:text-red-600" onClick={() => setLines((ls) => ls.filter((_, j) => j !== i))}><Trash2 className="h-4 w-4" /></button>}</td>
+                  <td>{lines.length > 1 && <button type="button" aria-label="Remove line" className="text-slate-500 hover:text-red-600" onClick={() => setLines((ls) => ls.filter((_, j) => j !== i))}><Trash2 className="h-4 w-4" /></button>}</td>
                 </tr>
               ))}
             </tbody>

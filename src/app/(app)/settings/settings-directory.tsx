@@ -14,7 +14,7 @@ export function SettingsDirectory({ sections }: { sections: { title: string; lin
   return (
     <div>
       <label className="relative block max-w-md">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
         <input value={q} onChange={(e) => setQ(e.target.value)} className="input pl-9" placeholder="Find a setting: NPI, write-off, two-factor, Stripe..." aria-label="Find a setting" />
       </label>
       {shown.length === 0 && <p className="mt-6 text-sm text-slate-500">No setting matches &ldquo;{q}&rdquo;.</p>}

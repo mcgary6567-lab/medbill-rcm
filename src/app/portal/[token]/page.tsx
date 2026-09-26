@@ -28,7 +28,7 @@ function Shell({ practice, children, t, lang, path }: { practice?: string; child
           <h1 className="text-xl font-bold text-slate-900">{practice ?? t.yourAccount}</h1>
         </div>
         {children}
-        <p className="mt-6 flex items-center justify-center gap-1.5 text-xs text-slate-400"><LogoMark className="h-4 w-4" id="cmd-portal" /> {t.securedBy}</p>
+        <p className="mt-6 flex items-center justify-center gap-1.5 text-xs text-slate-500"><LogoMark className="h-4 w-4" id="cmd-portal" /> {t.securedBy}</p>
       </div>
     </main>
   );

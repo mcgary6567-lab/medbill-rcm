@@ -73,7 +73,7 @@ export default async function BillingPage() {
                   <tr key={b.patientId}>
                     <td><PatientLink id={b.patientId} first={b.firstName} last={b.lastName} mrn={b.mrn} /></td>
                     <td className="text-right font-semibold"><Money cents={b.balanceCents} /></td>
-                    <td>{b.lastStatement ? fmtDate(b.lastStatement + "T00:00:00") : <span className="text-slate-400">Never</span>}</td>
+                    <td>{b.lastStatement ? fmtDate(b.lastStatement + "T00:00:00") : <span className="text-slate-500">Never</span>}</td>
                   </tr>
                 ))}
               </tbody>
@@ -96,7 +96,7 @@ export default async function BillingPage() {
             <ul className="space-y-2 text-sm">
               {policies.map((p) => (
                 <li key={p.id} className="flex items-center justify-between gap-2">
-                  <span className={p.active ? "" : "text-slate-400 line-through"}>{p.name} <span className="text-slate-500">{p.percent}%</span></span>
+                  <span className={p.active ? "" : "text-slate-500 line-through"}>{p.name} <span className="text-slate-500">{p.percent}%</span></span>
                   {admin && (
                     <form action={togglePolicyAction.bind(null, p.id, !p.active)}>
                       <button className="text-xs font-semibold text-brand-700 hover:underline">{p.active ? "Retire" : "Restore"}</button>
@@ -109,7 +109,7 @@ export default async function BillingPage() {
               <ActionForm action={createPolicyAction} className="mt-4 grid grid-cols-2 gap-2 border-t border-slate-100 pt-4">
                 <Field label="Name" className="col-span-2"><input name="name" className="input" placeholder="Courtesy discount" required /></Field>
                 <Field label="Kind">
-                  <select name="kind" className="select"><option value="courtesy">Courtesy</option><option value="self_pay">Self-pay</option><option value="prompt_pay">Prompt-pay</option><option value="hardship">Hardship</option></select>
+                  <select name="kind" aria-label="Discount type" className="select"><option value="courtesy">Courtesy</option><option value="self_pay">Self-pay</option><option value="prompt_pay">Prompt-pay</option><option value="hardship">Hardship</option></select>
                 </Field>
                 <Field label="Percent"><input name="percent" type="number" min="1" max="100" step="0.5" className="input" required /></Field>
                 <div className="col-span-2"><SubmitButton className="btn btn-secondary">Add policy</SubmitButton></div>
@@ -130,7 +130,7 @@ export default async function BillingPage() {
                 {plans.map((p) => (
                   <tr key={p.id}>
                     <td><PatientLink id={p.patientId} first={p.firstName} last={p.lastName} /></td>
-                    <td className="text-right tabular-nums">{money(p.paidCents)} <span className="text-slate-400">/ {money(p.totalCents)}</span></td>
+                    <td className="text-right tabular-nums">{money(p.paidCents)} <span className="text-slate-500">/ {money(p.totalCents)}</span></td>
                     <td>{p.nextDue ? fmtDate(p.nextDue + "T00:00:00") : "-"}{p.missed > 0 && <span className="ml-1 text-xs font-semibold text-red-700">{p.missed} missed</span>}</td>
                     <td><Badge tone={PLAN_TONE[p.status] ?? "slate"}>{p.status}</Badge></td>
                   </tr>
