@@ -1417,3 +1417,11 @@ export const authThrottle = pgTable("auth_throttle", {
   windowStart: timestamp("window_start", { withTimezone: true }).defaultNow().notNull(),
   count: integer("count").default(0).notNull(),
 });
+
+/* Operator alert state. See migration 0036 and server/ops-alerts.ts. */
+export const opsAlerts = pgTable("ops_alerts", {
+  kind: text("kind").primaryKey(),
+  windowStart: timestamp("window_start", { withTimezone: true }).defaultNow().notNull(),
+  hits: integer("hits").default(0).notNull(),
+  lastSentAt: timestamp("last_sent_at", { withTimezone: true }),
+});

@@ -45,6 +45,7 @@ export const SETTINGS_SECTIONS: { title: string; links: SettingsLink[] }[] = [
     title: "Oversight",
     links: [
       { href: "/settings/audit", label: "Audit log", description: "Every sign-in, change, export and payment, searchable", adminOnly: true, keywords: "history activity who changed" },
+      { href: "/settings/data-export", label: "Data export", description: "Download everything the practice has here, as one zip", adminOnly: true, keywords: "backup download leave csv zip portability" },
       { href: "/settings/compliance", label: "Compliance", description: "HIPAA control checks, access reviews and BAAs", adminOnly: true, keywords: "hipaa soc 2 baa" },
       { href: "/settings/menu", label: "Menu", description: "Hide the modules your practice does not use", adminOnly: true, keywords: "navigation sidebar hide modules" },
     ],
