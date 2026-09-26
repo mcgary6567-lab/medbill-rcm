@@ -1,6 +1,7 @@
-import { and, asc, desc, eq, isNull, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import type { Db } from "@/db";
 import { schema } from "@/db";
+import type { ContractRules } from "@/db/schema";
 
 const { feeSchedules, feeScheduleItems, underpayments, claims, charges, ledgerEntries, payers, patients, cptCodes } = schema;
 
@@ -24,18 +25,42 @@ export interface ExpectedAllowed {
   missing: string[];
 }
 
+/**
+ * What the contract says the payer should allow for these lines.
+ *
+ * With contract terms: a line carrying a modifier the contract prices
+ * differently (bilateral 50 at 150%, assistant 80 at 16%, and so on) is scaled
+ * by that percentage; and among codes subject to the multiple-procedure
+ * reduction, the highest-paid unit is paid in full and every other unit at the
+ * contract's reduced percentage, which is how Medicare and most commercial
+ * contracts apply it.
+ */
 export function expectedAllowed(
-  lines: { cpt: string; units: number }[],
+  lines: { cpt: string; units: number; modifiers?: string[] | null }[],
   rates: Map<string, number>,
+  terms: { rules?: ContractRules | null; mppr?: Set<string> } = {},
 ): ExpectedAllowed {
   let expectedCents = 0;
   const missing: string[] = [];
+  const reducible: number[] = [];
+  const mods = terms.rules?.modifiers ?? {};
+  const mpprPercent = terms.rules?.mpprPercent;
   for (const l of lines) {
     const rate = rates.get(l.cpt);
-    if (rate === undefined) missing.push(l.cpt);
-    else expectedCents += rate * l.units;
+    if (rate === undefined) { missing.push(l.cpt); continue; }
+    const factor = (l.modifiers ?? []).reduce((f, m) => (mods[m] !== undefined ? f * (mods[m] / 100) : f), 1);
+    const unit = Math.round(rate * factor);
+    if (mpprPercent !== undefined && mpprPercent !== null && terms.mppr?.has(l.cpt)) for (let i = 0; i < l.units; i++) reducible.push(unit);
+    else expectedCents += unit * l.units;
   }
+  reducible.sort((a, b) => b - a);
+  reducible.forEach((u, i) => { expectedCents += i === 0 ? u : Math.round((u * (mpprPercent ?? 100)) / 100); });
   return { expectedCents, missing };
+}
+
+/** True when a contract has terms the set-based scan cannot apply in SQL. */
+export function hasReductions(rules: ContractRules | null | undefined) {
+  return (rules?.mpprPercent !== undefined && rules?.mpprPercent !== null) || Object.keys(rules?.modifiers ?? {}).length > 0;
 }
 
 export interface UnderpaymentVerdict {
@@ -108,6 +133,14 @@ export async function contractRates(db: Db, practiceId: string, payerId: string)
   return s ? scheduleRates(db, s.id) : new Map();
 }
 
+/** Rates plus the contract's reduction terms. */
+export async function contractTerms(db: Db, practiceId: string, payerId: string) {
+  const s = await activeSchedule(db, practiceId, payerId);
+  if (!s) return { rates: new Map<string, number>(), mppr: new Set<string>(), rules: null };
+  const rows = await db.select().from(feeScheduleItems).where(eq(feeScheduleItems.feeScheduleId, s.id));
+  return { rates: new Map(rows.map((r) => [r.cpt, r.amountCents])), mppr: new Set(rows.filter((r) => r.mppr).map((r) => r.cpt)), rules: s.rules ?? null };
+}
+
 /**
  * What the practice charges for each code: its standard schedule where one
  * exists, otherwise the code's default fee. Charge entry prices from this.
@@ -173,10 +206,10 @@ export async function checkClaimUnderpayment(db: Db, claimId: string, remittance
   const [claim] = await db.select().from(claims).where(eq(claims.id, claimId)).limit(1);
   if (!claim || !["paid", "partially_paid"].includes(claim.status)) return null;
 
-  const rates = await contractRates(db, claim.practiceId, claim.payerId);
-  if (rates.size === 0) return null;
-  const lines = await db.select({ cpt: charges.cpt, units: charges.units }).from(charges).where(eq(charges.encounterId, claim.encounterId));
-  const exp = expectedAllowed(lines, rates);
+  const terms = await contractTerms(db, claim.practiceId, claim.payerId);
+  if (terms.rates.size === 0) return null;
+  const lines = await db.select({ cpt: charges.cpt, units: charges.units, modifiers: charges.modifiers }).from(charges).where(eq(charges.encounterId, claim.encounterId));
+  const exp = expectedAllowed(lines, terms.rates, terms);
   if (exp.missing.length) return null;
 
   const entries = await db
@@ -226,6 +259,8 @@ export async function scanUnderpayments(db: Db, practiceId: string): Promise<{ f
       FROM claims c
       JOIN charges ch ON ch.encounter_id = c.encounter_id
       JOIN fee_schedules fs ON fs.practice_id = c.practice_id AND fs.payer_id = c.payer_id AND fs.active
+        -- Contracts with reductions are checked claim by claim below.
+        AND COALESCE(fs.rules->>'mpprPercent', '') = '' AND COALESCE(fs.rules->'modifiers', '{}'::jsonb) = '{}'::jsonb
       LEFT JOIN fee_schedule_items fi ON fi.fee_schedule_id = fs.id AND fi.cpt = ch.cpt
       WHERE c.practice_id = ${practiceId} AND c.status IN ('paid', 'partially_paid')
       GROUP BY c.id, c.payer_id
@@ -256,7 +291,13 @@ export async function scanUnderpayments(db: Db, practiceId: string): Promise<{ f
     )
     SELECT count(*)::int AS n FROM upserted
   `);
-  return { flagged: Number(result.rows[0]?.n ?? 0) };
+  let flagged = Number(result.rows[0]?.n ?? 0);
+  const withTerms = await db.select().from(feeSchedules).where(and(eq(feeSchedules.practiceId, practiceId), eq(feeSchedules.active, true)));
+  for (const sched of withTerms.filter((x) => x.payerId && hasReductions(x.rules))) {
+    const paid = await db.select({ id: claims.id }).from(claims).where(and(eq(claims.practiceId, practiceId), eq(claims.payerId, sched.payerId!), inArray(claims.status, ["paid", "partially_paid"])));
+    for (const c of paid) if ((await checkClaimUnderpayment(db, c.id))?.underpaid) flagged++;
+  }
+  return { flagged };
 }
 
 export async function listUnderpayments(db: Db, practiceId: string, status: string = "open") {

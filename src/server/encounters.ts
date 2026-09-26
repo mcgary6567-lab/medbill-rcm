@@ -12,6 +12,7 @@ export interface NewEncounterInput {
   appointmentId?: string | null;
   dateOfService: string;
   placeOfService: string;
+  locationId?: string | null;
   diagnoses: string[];
   lines: { cpt: string; modifiers: string[]; units: number; chargeCents: number; dxPointers: number[]; description?: string }[];
 }
@@ -26,6 +27,7 @@ export async function createEncounterWithClaim(db: Db, practiceId: string, input
       appointmentId: input.appointmentId ?? null,
       dateOfService: input.dateOfService,
       placeOfService: input.placeOfService,
+      locationId: input.locationId ?? null,
       diagnoses: input.diagnoses.map((d) => d.toUpperCase().trim()).filter(Boolean),
     })
     .returning();

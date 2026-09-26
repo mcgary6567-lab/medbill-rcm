@@ -10,6 +10,7 @@ import {
   markStatementSent, recordPlanPayment, setPolicyActive, voidStatement,
 } from "@/server/billing";
 import { getPolicies } from "@/server/policies";
+import { mailStatement, mailUnsentStatements } from "@/server/mail";
 
 const ok = (message: string): FormResult => ({ ok: true, message });
 const fail = (e: unknown): FormResult => ({ ok: false, message: e instanceof Error ? e.message : "Something went wrong" });
@@ -176,5 +177,28 @@ export async function sendPayLinksAction(_prev: FormResult, formData: FormData):
     return { ok: true, message: `${r.sent} pay link${r.sent === 1 ? "" : "s"} sent${r.skipped ? `, ${r.skipped} could not be reached (no email or text consent)` : ""}${r.excluded ? `, ${r.excluded} skipped (on a plan, in collections or messaged this week)` : ""}` };
   } catch (e) {
     return { ok: false, message: e instanceof Error ? e.message : "Could not send" };
+  }
+}
+
+export async function mailStatementAction(id: string, _prev: FormResult): Promise<FormResult> {
+  const s = await requireRole(CAN_WRITE);
+  try {
+    const r = await mailStatement(await getDb(), s.practiceId, id, { userId: s.userId });
+    revalidatePath(`/statements/${id}`);
+    revalidatePath("/billing");
+    return { ok: true, message: r.test ? "Sent to Lob with a test key: rendered in Lob's dashboard, not printed or mailed." : `Sent to Lob for printing${r.expectedDelivery ? `; expected delivery ${r.expectedDelivery}` : ""}.` };
+  } catch (e) {
+    return { ok: false, message: e instanceof Error ? e.message : "Could not mail it" };
+  }
+}
+
+export async function mailUnsentStatementsAction(_prev: FormResult): Promise<FormResult> {
+  const s = await requireRole(CAN_WRITE);
+  try {
+    const r = await mailUnsentStatements(await getDb(), s.practiceId, { userId: s.userId });
+    revalidatePath("/billing");
+    return { ok: r.failed.length === 0, message: `${r.mailed} mailed${r.skipped ? `, ${r.skipped} skipped for an incomplete address` : ""}${r.failed.length ? `, ${r.failed.length} failed: ${r.failed[0]}` : ""}` };
+  } catch (e) {
+    return { ok: false, message: e instanceof Error ? e.message : "Could not mail statements" };
   }
 }

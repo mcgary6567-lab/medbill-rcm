@@ -12,6 +12,7 @@ import { eligibilityAction, patientPaymentAction } from "@/app/(app)/actions";
 import { Card, PageHeader, Badge, Money, Empty, Field } from "@/components/ui";
 import { fmtDate, fmtDateTime, money } from "@/lib/utils";
 import { BillingSection } from "./billing-section";
+import { TerminalSection } from "./terminal-section";
 import { AuthorizationsSection } from "./authorizations-section";
 import { LabsSection } from "./labs-section";
 import { WorkPanel } from "@/components/work-panel";
@@ -142,6 +143,7 @@ export default async function PatientPage({ params }: { params: Promise<{ id: st
         </Card>
       </div>
 
+      <TerminalSection db={db} practiceId={s.practiceId} patientId={patient.id} canWrite={canWrite} admin={s.role === "admin"} />
       <BillingSection db={db} practiceId={s.practiceId} patientId={patient.id} />
       <AuthorizationsSection db={db} practiceId={s.practiceId} patientId={patient.id} />
       <LabsSection db={db} practiceId={s.practiceId} patientId={patient.id} />

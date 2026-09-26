@@ -4,7 +4,9 @@ import { and, asc, eq } from "drizzle-orm";
 import { getDb, schema } from "@/db";
 import { requireSession } from "@/lib/auth";
 import { scheduleRates, standardCharges } from "@/server/fees";
-import { saveScheduleAction } from "@/app/(app)/fees-actions";
+import { importContractAction, saveContractTermsAction, saveScheduleAction } from "@/app/(app)/fees-actions";
+import { formatModifierRules } from "@/server/contracts";
+import { ActionForm, SubmitButton } from "@/components/action-form";
 import { Card, PageHeader } from "@/components/ui";
 import { money } from "@/lib/utils";
 
@@ -21,6 +23,7 @@ export default async function FeeScheduleEditor({ params }: { params: Promise<{ 
     .limit(1);
   if (!schedule) notFound();
 
+  const mpprCodes = new Set((await db.select({ cpt: schema.feeScheduleItems.cpt }).from(schema.feeScheduleItems).where(and(eq(schema.feeScheduleItems.feeScheduleId, schedule.id), eq(schema.feeScheduleItems.mppr, true)))).map((r) => r.cpt));
   const [codes, rates, standard] = await Promise.all([
     db.select().from(schema.cptCodes).orderBy(asc(schema.cptCodes.code)),
     scheduleRates(db, schedule.id),
@@ -40,6 +43,28 @@ export default async function FeeScheduleEditor({ params }: { params: Promise<{ 
         }
         actions={<Link href="/settings/fees" className="btn btn-secondary">All schedules</Link>}
       />
+      {isContract && (
+        <div className="mb-6 grid gap-6 lg:grid-cols-2">
+          <Card title="Load the contract from a spreadsheet">
+            <ActionForm action={importContractAction.bind(null, schedule.id)} className="space-y-3 text-sm">
+              <p className="text-slate-600">A CSV with a code column (CPT, HCPCS or Code) and an allowed amount column (Allowed, Rate or Fee). An optional column named MPPR or Mult Proc marks codes subject to the multiple-procedure reduction (Y, 1, or the Medicare indicator 2 or 3).</p>
+              <input type="file" name="file" accept=".csv,text/csv,text/plain" className="block text-sm" disabled={!admin} aria-label="Contract spreadsheet" />
+              <label className="flex items-center gap-2"><input type="checkbox" name="replace" defaultChecked disabled={!admin} /> Replace every rate (codes not in the file are removed)</label>
+              {admin && <SubmitButton pendingLabel="Loading...">Load contract</SubmitButton>}
+            </ActionForm>
+          </Card>
+          <Card title="Contract terms">
+            <ActionForm action={saveContractTermsAction.bind(null, schedule.id)} className="space-y-3 text-sm">
+              <label className="block"><span className="label">Multiple-procedure reduction: % paid for each additional procedure (Medicare pays 50; blank for none)</span>
+                <input name="mpprPercent" type="number" min="0" max="100" step="0.1" defaultValue={schedule.rules?.mpprPercent ?? ""} className="input w-32" disabled={!admin} /></label>
+              <label className="block"><span className="label">Modifier percentages of the rate, like 50=150, 80=16, 62=62.5</span>
+                <input name="modifiers" defaultValue={formatModifierRules(schedule.rules?.modifiers)} className="input font-mono" disabled={!admin} /></label>
+              <p className="text-xs text-slate-500">{mpprCodes.size} code{mpprCodes.size === 1 ? " is" : "s are"} marked for the reduction. Underpayment checks pay the highest one in full and the rest at this percentage. Check the percentages against your contract; payers differ.</p>
+              {admin && <SubmitButton pendingLabel="Saving...">Save terms</SubmitButton>}
+            </ActionForm>
+          </Card>
+        </div>
+      )}
       <Card>
         <form action={saveScheduleAction.bind(null, schedule.id)}>
           <table className="table">
@@ -58,7 +83,7 @@ export default async function FeeScheduleEditor({ params }: { params: Promise<{ 
                 const std = standard.get(c.code) ?? c.defaultFeeCents;
                 return (
                   <tr key={c.code}>
-                    <td className="font-mono">{c.code}</td>
+                    <td className="font-mono">{c.code}{mpprCodes.has(c.code) && <span className="ml-1 rounded bg-slate-100 px-1 text-[10px] font-sans text-slate-600" title="Subject to the multiple-procedure reduction">MPPR</span>}</td>
                     <td>{c.description}</td>
                     {isContract && <td className="text-right tabular-nums text-slate-500">{money(std)}</td>}
                     <td className="text-right">

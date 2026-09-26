@@ -25,10 +25,12 @@ export function ChargeEntryForm({
   defaults,
   initialPatient,
   providers,
+  locations = [],
   cpts,
   icds,
 }: {
-  defaults: { providerId?: string; appointmentId?: string; dos: string };
+  defaults: { providerId?: string; appointmentId?: string; dos: string; locationId?: string | null };
+  locations?: { id: string; name: string; placeOfService: string }[];
   initialPatient: PatientOption | null;
   providers: { id: string; name: string }[];
   cpts: { code: string; description: string; fee: number }[];
@@ -38,7 +40,8 @@ export function ChargeEntryForm({
   const [patientId, setPatientId] = useState(initialPatient?.id ?? "");
   const [providerId, setProviderId] = useState(defaults.providerId ?? providers[0]?.id ?? "");
   const [dos, setDos] = useState(defaults.dos);
-  const [pos, setPos] = useState("11");
+  const [locationId, setLocationId] = useState(defaults.locationId ?? "");
+  const [pos, setPos] = useState(locations.find((l) => l.id === defaults.locationId)?.placeOfService ?? "11");
   const [dx, setDx] = useState<string[]>([""]);
   const [lines, setLines] = useState<Line[]>([{ cpt: "", modifiers: "", units: 1, charge: "", dxPointers: "1", description: "" }]);
 
@@ -52,6 +55,7 @@ export function ChargeEntryForm({
     appointmentId: defaults.appointmentId ?? null,
     dateOfService: dos,
     placeOfService: pos,
+    locationId: locationId || null,
     diagnoses: dx.map((d) => d.trim()).filter(Boolean),
     lines: lines
       .filter((l) => l.cpt.trim())
@@ -73,6 +77,14 @@ export function ChargeEntryForm({
         <Field label="Patient">
           <PatientPicker initial={initialPatient} onSelect={(p) => setPatientId(p?.id ?? "")} />
         </Field>
+        {locations.length > 0 && (
+          <Field label="Location">
+            <select className="select" value={locationId} onChange={(e) => { setLocationId(e.target.value); const l = locations.find((x) => x.id === e.target.value); if (l) setPos(l.placeOfService); }}>
+              <option value="">Main office (billing address)</option>
+              {locations.map((l) => <option key={l.id} value={l.id}>{l.name}</option>)}
+            </select>
+          </Field>
+        )}
         <Field label="Rendering provider">
           <select className="select" value={providerId} onChange={(e) => setProviderId(e.target.value)}>
             {providers.map((p) => (

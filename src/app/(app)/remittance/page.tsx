@@ -5,6 +5,7 @@ import { Card, PageHeader, Money, Empty, Badge } from "@/components/ui";
 import { fmtDate, fmtDateTime } from "@/lib/utils";
 import { RemittanceTools } from "./tools";
 import { pollBlocker, pollStatus } from "@/server/era-poll";
+import { eraGaps } from "@/server/transaction-enrollment";
 import { pollNowAction } from "@/app/(app)/era-actions";
 import { ActionForm, SubmitButton } from "@/components/action-form";
 
@@ -14,17 +15,22 @@ export default async function RemittancePage() {
   const s = await requireSession();
   const db = await getDb();
   const rows = await db.select().from(schema.remittances).where(eq(schema.remittances.practiceId, s.practiceId)).orderBy(desc(schema.remittances.receivedAt)).limit(100);
-  const [blocker, poll] = await Promise.all([pollBlocker(db, s.practiceId), pollStatus(db, s.practiceId)]);
+  const [blocker, poll, gaps] = await Promise.all([pollBlocker(db, s.practiceId), pollStatus(db, s.practiceId), eraGaps(db, s.practiceId)]);
   return (
     <>
       <PageHeader title="Remittance (ERA / 835)" subtitle="Electronic remittance advice with automated payment posting" actions={<><a href="/remittance/deposits" className="btn btn-secondary">Bank deposits</a><RemittanceTools /></>} />
       <Card title="Automatic remittances from Stedi" className="mb-6">
+        {gaps.length > 0 && (
+          <p className="mb-3 rounded-lg bg-amber-50 p-3 text-sm text-amber-900">
+            No ERA enrollment on record for {gaps.slice(0, 5).map((g) => g.payerName).join(", ")}{gaps.length > 5 ? ` and ${gaps.length - 5} more` : ""}: their remittances will not arrive here until it is approved. <a href="/settings/enrollment" className="font-semibold underline">Track enrollment</a>
+          </p>
+        )}
         {blocker ? (
           <p className="text-sm text-slate-600">{blocker}</p>
         ) : (
           <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
             <p className="text-slate-600">
-              Every morning, 835s that payers sent through Stedi are imported and posted here on their own.{" "}
+              Every morning, 835s that payers sent through Stedi are imported and posted here on their own, and claim acknowledgments (277CA) update their claims.{" "}
               {poll?.lastPolledAt ? <>Last checked {fmtDateTime(poll.lastPolledAt)}; {poll.erasImported} posted so far.</> : "Not checked yet."}
               {poll?.lastError && <span className="block text-red-700">Last check failed: {poll.lastError}</span>}
             </p>

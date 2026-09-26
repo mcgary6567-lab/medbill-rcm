@@ -206,6 +206,7 @@ export const appointments = pgTable(
     status: text("status").notNull().default("scheduled"), // scheduled | checked_in | completed | no_show | cancelled
     reason: text("reason"),
     fhirId: text("fhir_id"),
+    locationId: uuid("location_id").references(() => locations.id),
   },
   (t) => [index("appointments_start_idx").on(t.practiceId, t.startsAt)],
 );
@@ -222,6 +223,7 @@ export const encounters = pgTable("encounters", {
   appointmentId: uuid("appointment_id").references(() => appointments.id),
   dateOfService: date("date_of_service").notNull(),
   placeOfService: text("place_of_service").notNull().default("11"),
+  locationId: uuid("location_id").references(() => locations.id),
   diagnoses: jsonb("diagnoses").$type<string[]>().notNull().default([]),
   status: text("status").notNull().default("open"), // open | billed
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
@@ -399,6 +401,7 @@ export const feeSchedules = pgTable("fee_schedules", {
   payerId: uuid("payer_id").references(() => payers.id),
   name: text("name").notNull(),
   effectiveFrom: date("effective_from").notNull().defaultNow(),
+  rules: jsonb("rules").$type<ContractRules>(),
   active: boolean("active").notNull().default(true),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
@@ -408,6 +411,8 @@ export const feeScheduleItems = pgTable("fee_schedule_items", {
   feeScheduleId: uuid("fee_schedule_id").notNull().references(() => feeSchedules.id, { onDelete: "cascade" }),
   cpt: text("cpt").notNull(),
   amountCents: integer("amount_cents").notNull(),
+  /** Subject to the contract's multiple-procedure reduction. */
+  mppr: boolean("mppr").notNull().default(false),
 });
 
 /** A paid claim whose allowed amount fell short of its contract. One per claim. */
@@ -495,6 +500,9 @@ export const statements = pgTable("statements", {
   status: text("status").notNull().default("generated"), // generated | sent | void
   channel: text("channel"),
   sentAt: timestamp("sent_at", { withTimezone: true }),
+  mailId: text("mail_id"),
+  mailStatus: text("mail_status"),
+  mailedAt: timestamp("mailed_at", { withTimezone: true }),
   createdBy: uuid("created_by").references(() => users.id),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
@@ -735,6 +743,14 @@ export const fhirConnections = pgTable("fhir_connections", {
   practiceId: uuid("practice_id").primaryKey().references(() => practices.id),
   baseUrl: text("base_url").notNull(),
   tokenSealed: text("token_sealed"),
+  /** token: a pasted bearer token; smart: SMART backend services (signed JWT, client credentials). */
+  authMode: text("auth_mode").notNull().default("token"),
+  clientId: text("client_id"),
+  tokenUrl: text("token_url"),
+  scope: text("scope"),
+  keyId: text("key_id"),
+  privateKeySealed: text("private_key_sealed"),
+  publicJwk: jsonb("public_jwk").$type<Record<string, unknown>>(),
   lastSyncAt: timestamp("last_sync_at", { withTimezone: true }),
   lastResult: jsonb("last_result").$type<Record<string, unknown>>(),
 });
@@ -1424,4 +1440,54 @@ export const opsAlerts = pgTable("ops_alerts", {
   windowStart: timestamp("window_start", { withTimezone: true }).defaultNow().notNull(),
   hits: integer("hits").default(0).notNull(),
   lastSentAt: timestamp("last_sent_at", { withTimezone: true }),
+});
+
+/* Product gaps round. See migration 0037. */
+export type ContractRules = {
+  /** Percent paid for each procedure after the highest-paid one, among codes marked mppr (Medicare uses 50). */
+  mpprPercent?: number | null;
+  /** Percent of the rate paid when a line carries the modifier, e.g. { "50": 150, "80": 16 }. */
+  modifiers?: Record<string, number>;
+};
+
+export const transactionEnrollments = pgTable("transaction_enrollments", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  practiceId: uuid("practice_id").notNull().references(() => practices.id),
+  payerId: uuid("payer_id").notNull().references(() => payers.id),
+  transaction: text("transaction").notNull(),
+  status: text("status").notNull().default("not_started"),
+  submittedOn: date("submitted_on"),
+  approvedOn: date("approved_on"),
+  reference: text("reference"),
+  notes: text("notes"),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+}, (t) => [uniqueIndex("transaction_enrollments_practice_id_payer_id_transaction_key").on(t.practiceId, t.payerId, t.transaction)]);
+
+export const terminalPayments = pgTable("terminal_payments", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  practiceId: uuid("practice_id").notNull().references(() => practices.id),
+  patientId: uuid("patient_id").notNull().references(() => patients.id),
+  readerId: text("reader_id").notNull(),
+  paymentIntentId: text("payment_intent_id").notNull().unique(),
+  amountCents: integer("amount_cents").notNull(),
+  status: text("status").notNull().default("waiting"), // waiting | succeeded | failed | canceled
+  failure: text("failure"),
+  ledgerEntryId: uuid("ledger_entry_id"),
+  createdBy: uuid("created_by").references(() => users.id),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  completedAt: timestamp("completed_at", { withTimezone: true }),
+});
+
+export const locations = pgTable("locations", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  practiceId: uuid("practice_id").notNull().references(() => practices.id),
+  name: text("name").notNull(),
+  npi: text("npi"),
+  address1: text("address1").notNull(),
+  city: text("city").notNull(),
+  state: text("state").notNull(),
+  zip: text("zip").notNull(),
+  placeOfService: text("place_of_service").notNull().default("11"),
+  active: boolean("active").notNull().default(true),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });

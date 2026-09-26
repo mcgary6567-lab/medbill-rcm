@@ -21,8 +21,8 @@ import { appSecret as signingKey } from "@/lib/app-secret";
 
 const { practiceIntegrations, auditLog } = schema;
 
-export type Provider = "stedi" | "stripe" | "twilio" | "resend" | "anthropic";
-export const PROVIDER_KEYS: Provider[] = ["stedi", "stripe", "twilio", "resend", "anthropic"];
+export type Provider = "stedi" | "stripe" | "twilio" | "resend" | "lob" | "anthropic";
+export const PROVIDER_KEYS: Provider[] = ["stedi", "stripe", "twilio", "resend", "lob", "anthropic"];
 
 type Field = { key: string; label: string; placeholder?: string; help?: string; pattern?: RegExp; patternHint?: string; optional?: boolean; kind?: "text" | "boolean" };
 
@@ -79,6 +79,15 @@ export const PROVIDERS: Record<Provider, {
       { key: "from", label: "Send from", placeholder: "Summit Health Billing <billing@yourpractice.com>", help: "An address on a domain you verified in Resend.", optional: true },
     ],
   },
+  lob: {
+    name: "Lob",
+    category: "Printed mail",
+    purpose: "Prints patient statements and mails them first class, for patients without email or text, or who asked for paper.",
+    unlocks: ["Mailed paper statements"],
+    signup: "https://dashboard.lob.com/settings/api-keys",
+    secrets: [{ key: "apiKey", label: "Secret API key", placeholder: "test_… or live_…", pattern: /^(test|live)_[A-Za-z0-9]{10,}$/, patternHint: "starts with test_ or live_", help: "A test_ key renders letters without printing or mailing them; use it first." }],
+    settings: [],
+  },
   anthropic: {
     name: "Claude (Anthropic)",
     category: "AI",
@@ -97,6 +106,7 @@ export type IntegrationConfig = {
   stripe: { secretKey: string; webhookSecret: string | null } | null;
   twilio: { accountSid: string; authToken: string; from: string } | null;
   resend: { apiKey: string; from: string | null } | null;
+  lob: { apiKey: string } | null;
   anthropic: { apiKey: string; phiAllowed: boolean } | null;
   sources: Record<Provider, "practice" | "environment" | "off">;
 };
@@ -111,8 +121,9 @@ export function envConfig(): IntegrationConfig {
     stripe: env("STRIPE_SECRET_KEY") ? { secretKey: env("STRIPE_SECRET_KEY")!, webhookSecret: env("STRIPE_WEBHOOK_SECRET") ?? null } : null,
     twilio: env("TWILIO_ACCOUNT_SID") && env("TWILIO_AUTH_TOKEN") && env("TWILIO_FROM") ? { accountSid: env("TWILIO_ACCOUNT_SID")!, authToken: env("TWILIO_AUTH_TOKEN")!, from: env("TWILIO_FROM")! } : null,
     resend: env("RESEND_API_KEY") ? { apiKey: env("RESEND_API_KEY")!, from: env("CONTACT_FROM_EMAIL") ?? null } : null,
+    lob: env("LOB_API_KEY") ? { apiKey: env("LOB_API_KEY")! } : null,
     anthropic: env("ANTHROPIC_API_KEY") ? { apiKey: env("ANTHROPIC_API_KEY")!, phiAllowed: env("AI_PHI_ALLOWED") === "1" } : null,
-    sources: { stedi: "off", stripe: "off", twilio: "off", resend: "off", anthropic: "off" },
+    sources: { stedi: "off", stripe: "off", twilio: "off", resend: "off", lob: "off", anthropic: "off" },
   };
   for (const p of PROVIDER_KEYS) cfg.sources[p] = cfg[p] ? "environment" : "off";
   return cfg;
@@ -139,6 +150,7 @@ function fromRow(provider: Provider, row: Row): IntegrationConfig[Provider] {
     case "stripe": return s.secretKey ? { secretKey: s.secretKey, webhookSecret: s.webhookSecret || null } : null;
     case "twilio": return s.authToken && str("accountSid") && str("from") ? { accountSid: str("accountSid")!, authToken: s.authToken, from: str("from")! } : null;
     case "resend": return s.apiKey ? { apiKey: s.apiKey, from: str("from") } : null;
+    case "lob": return s.apiKey ? { apiKey: s.apiKey } : null;
     case "anthropic": return s.apiKey ? { apiKey: s.apiKey, phiAllowed: st.phiAllowed === true } : null;
   }
 }
@@ -301,6 +313,13 @@ export const PROBES: Record<Provider, (cfg: IntegrationConfig, http: Http) => Pr
     if (fromDomain && !d) return { ok: false, message: `The key works, but ${fromDomain} is not a domain in this Resend account.` };
     if (d && d.status !== "verified") return { ok: false, message: `The key works, but ${d.name} is ${d.status} in Resend, not verified.` };
     return { ok: true, message: `Connected to Resend (${domains.filter((x) => x.status === "verified").length} verified domain${domains.length === 1 ? "" : "s"}).` };
+  },
+  async lob(cfg, http) {
+    const key = cfg.lob!.apiKey;
+    const res = await http("https://api.lob.com/v1/addresses?limit=1", { method: "GET", headers: { Authorization: `Basic ${Buffer.from(`${key}:`).toString("base64")}` } });
+    if (res.status === 401 || res.status === 403) return { ok: false, message: "Lob rejected the API key." };
+    if (!res.ok) return { ok: false, message: `Lob answered ${res.status}.` };
+    return { ok: true, message: key.startsWith("test_") ? "Connected to Lob with a test key: letters are rendered but not printed or mailed." : "Connected to Lob. Mailed statements will be printed and sent." };
   },
   async anthropic(cfg) {
     try {

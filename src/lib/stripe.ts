@@ -82,7 +82,60 @@ export class Stripe {
       off_session: "true", confirm: "true", description: p.description, metadata: p.metadata,
     }, p.idempotencyKey);
   }
+
+  /* Terminal, server-driven (https://docs.stripe.com/terminal/payments/collect-card-payment?terminal-sdk-platform=server-driven). */
+
+  listReaders() {
+    return this.call<{ data: TerminalReader[] }>("GET", "/terminal/readers?limit=100");
+  }
+
+  getReader(id: string) {
+    return this.call<TerminalReader>("GET", `/terminal/readers/${encodeURIComponent(id)}`);
+  }
+
+  /** A card-present PaymentIntent, captured automatically when the reader authorizes it. */
+  createCardPresentIntent(p: { amountCents: number; description: string; metadata: Record<string, string>; idempotencyKey: string }) {
+    return this.call<{ id: string; status: string }>("POST", "/payment_intents", {
+      amount: p.amountCents, currency: "usd", payment_method_types: ["card_present"], capture_method: "automatic",
+      description: p.description, metadata: p.metadata,
+    }, p.idempotencyKey);
+  }
+
+  processPaymentIntent(readerId: string, paymentIntentId: string) {
+    return this.call<TerminalReader>("POST", `/terminal/readers/${encodeURIComponent(readerId)}/process_payment_intent`, { payment_intent: paymentIntentId, process_config: { enable_customer_cancellation: "true" } });
+  }
+
+  cancelReaderAction(readerId: string) {
+    return this.call<TerminalReader>("POST", `/terminal/readers/${encodeURIComponent(readerId)}/cancel_action`);
+  }
+
+  cancelPaymentIntent(id: string) {
+    return this.call<{ id: string; status: string }>("POST", `/payment_intents/${encodeURIComponent(id)}/cancel`);
+  }
+
+  /** Test mode only: a simulated reader "sees" a card (defaults to a Visa test card). */
+  presentPaymentMethod(readerId: string) {
+    return this.call<TerminalReader>("POST", `/test_helpers/terminal/readers/${encodeURIComponent(readerId)}/present_payment_method`);
+  }
+
+  createLocation(p: { displayName: string; line1: string; city: string; state: string; postalCode: string }) {
+    return this.call<{ id: string }>("POST", "/terminal/locations", { display_name: p.displayName, address: { line1: p.line1, city: p.city, state: p.state, postal_code: p.postalCode, country: "US" } });
+  }
+
+  /** Registers a reader; the code "simulated-wpe" makes a simulated WisePOS E in test mode. */
+  registerReader(p: { registrationCode: string; location: string; label?: string }) {
+    return this.call<TerminalReader>("POST", "/terminal/readers", { registration_code: p.registrationCode, location: p.location, label: p.label });
+  }
 }
+
+export type TerminalReader = {
+  id: string;
+  label: string | null;
+  device_type: string;
+  status: string | null;
+  livemode: boolean;
+  action: { type: string; status: string; failure_code: string | null; failure_message: string | null; process_payment_intent?: { payment_intent: string } } | null;
+};
 
 export function stripeClient(keys: StripeKeys, http?: Http) {
   if (!keys?.secretKey) throw new Error("Online payments are not set up: connect Stripe in Settings → Integrations");

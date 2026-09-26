@@ -235,6 +235,7 @@ const encounterSchema = z.object({
   appointmentId: z.string().uuid().nullable().optional(),
   dateOfService: z.string().min(8),
   placeOfService: z.string().min(2),
+  locationId: z.string().uuid().nullable().optional(),
   diagnoses: z.array(z.string().min(3)).min(1).max(12),
   lines: z
     .array(
@@ -266,6 +267,7 @@ export async function createEncounterAction(_prev: ActionResult | undefined, for
     await assertOwned(db, s.practiceId, "patient", parsed.data.patientId);
     await assertOwned(db, s.practiceId, "provider", parsed.data.providerId);
     if (parsed.data.appointmentId) await assertOwned(db, s.practiceId, "appointment", parsed.data.appointmentId);
+    if (parsed.data.locationId) await assertOwned(db, s.practiceId, "location", parsed.data.locationId);
   } catch (e) {
     return fail(e);
   }

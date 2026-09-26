@@ -18,17 +18,20 @@ export function ActionForm({
   action,
   children,
   className,
+  id,
 }: {
   action: (prev: FormResult, formData: FormData) => Promise<FormResult>;
   children: ReactNode;
   className?: string;
+  /** Lets inputs elsewhere (a table row's cells) join the form with form="id". */
+  id?: string;
 }) {
   const [state, formAction] = useActionState(action, undefined);
   useEffect(() => {
     if (state?.message) toast(state.ok, state.message);
   }, [state]);
   return (
-    <form action={formAction} className={className}>
+    <form id={id} action={formAction} className={className}>
       {children}
       {state?.message && (
         <p className={`mt-2 text-xs font-medium ${state.ok ? "text-green-700" : "text-red-700"}`}>{state.message}</p>

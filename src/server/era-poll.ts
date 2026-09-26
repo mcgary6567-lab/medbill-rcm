@@ -14,7 +14,7 @@ import { schema } from "@/db";
 import { getClearinghouse, type ClearinghouseGateway } from "@/lib/clearinghouse/gateway";
 import { parseEdi835 } from "@/lib/edi/x835";
 import { practiceConfig } from "./integrations";
-import { importRemittance, postRemittance } from "./claims";
+import { applyInbound277, importRemittance, postRemittance } from "./claims";
 import { notify } from "./notifications";
 
 const { clearinghousePolls, inboundTransactions, claims, practices } = schema;
@@ -46,7 +46,7 @@ export async function pollRemittances(db: Db, practiceId: string, opts: { now?: 
   // First run looks back 30 days; Stedi wants a start at least a minute in the past.
   const since = new Date(now.getTime() - 30 * 86_400_000);
   let cursor = state?.cursor ?? null;
-  const summary = { seen: 0, imported: 0, skipped: 0, paidCents: 0, errors: [] as string[] };
+  const summary = { seen: 0, imported: 0, skipped: 0, paidCents: 0, acknowledged: 0, rejected: 0, errors: [] as string[] };
   try {
     for (let page = 0; page < MAX_PAGES; page++) {
       const r = await gateway.pollInbound(cursor, since);
@@ -69,8 +69,13 @@ export async function pollRemittances(db: Db, practiceId: string, opts: { now?: 
             summary.imported++;
             summary.paidCents += parsed.totalPaidCents;
           }
+        } else if (item.transactionSet === "277" && item.x12) {
+          const r = await applyInbound277(db, practiceId, item.x12);
+          summary.acknowledged += r.accepted + r.rejected;
+          summary.rejected += r.rejected;
+          note = `277CA: ${r.accepted} accepted, ${r.rejected} rejected${r.unmatched ? `, ${r.unmatched} not this practice's` : ""}`;
         } else {
-          note = item.transactionSet === "835" ? "No X12 file in Stedi's response" : `Transaction set ${item.transactionSet} (not a remittance)`;
+          note = item.transactionSet === "835" || item.transactionSet === "277" ? "No X12 file in Stedi's response" : `Transaction set ${item.transactionSet} (not read)`;
         }
         await db.insert(inboundTransactions).values({ practiceId, transactionId: item.transactionId, transactionSet: item.transactionSet, remittanceId, note }).onConflictDoNothing();
       }
@@ -84,6 +89,9 @@ export async function pollRemittances(db: Db, practiceId: string, opts: { now?: 
     const message = e instanceof Error ? e.message.slice(0, 300) : "Polling failed";
     await db.insert(clearinghousePolls).values({ practiceId, cursor, lastPolledAt: now, lastError: message }).onConflictDoUpdate({ target: clearinghousePolls.practiceId, set: { cursor, lastPolledAt: now, lastError: message } });
     throw e;
+  }
+  if (summary.rejected) {
+    await notify(db, practiceId, { kind: "claims_rejected", title: `${summary.rejected} claim${summary.rejected === 1 ? "" : "s"} rejected by the payer's front end`, body: "Fix and resubmit them from Denials.", href: "/denials" });
   }
   if (summary.imported) {
     await notify(db, practiceId, { kind: "eras", title: `${summary.imported} remittance${summary.imported === 1 ? "" : "s"} posted from Stedi`, body: `$${(summary.paidCents / 100).toFixed(2)} in payments posted automatically.`, href: "/remittance" });

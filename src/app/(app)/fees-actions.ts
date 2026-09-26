@@ -8,6 +8,8 @@ import { CAN_ADJUST, CAN_WRITE, requireRole, requireSession } from "@/lib/auth";
 import {
   contractFromPercent, ensureSchedule, saveScheduleItems, scanUnderpayments, setUnderpaymentStatus,
 } from "@/server/fees";
+import { importContractCsv, saveContractRules } from "@/server/contracts";
+import type { FormResult } from "@/components/action-form";
 
 /** Pricing changes what the practice bills, so only an administrator may make them. */
 async function requireAdmin() {
@@ -65,4 +67,29 @@ export async function underpaymentStatusAction(id: string, status: string): Prom
   const db = await getDb();
   await setUnderpaymentStatus(db, s.practiceId, id, status);
   revalidatePath("/underpayments");
+}
+
+export async function saveContractTermsAction(scheduleId: string, _prev: FormResult, formData: FormData): Promise<FormResult> {
+  try {
+    const s = await requireAdmin();
+    await saveContractRules(await getDb(), s.practiceId, scheduleId, { mpprPercent: String(formData.get("mpprPercent") ?? ""), modifiers: String(formData.get("modifiers") ?? "") }, s.userId);
+    revalidatePath(`/settings/fees/${scheduleId}`);
+    return { ok: true, message: "Contract terms saved. Underpayment checks use them from now on." };
+  } catch (e) {
+    return { ok: false, message: e instanceof Error ? e.message : "Could not save" };
+  }
+}
+
+export async function importContractAction(scheduleId: string, _prev: FormResult, formData: FormData): Promise<FormResult> {
+  try {
+    const s = await requireAdmin();
+    const file = formData.get("file");
+    if (!(file instanceof File) || file.size === 0) return { ok: false, message: "Choose the contract spreadsheet (CSV) first" };
+    if (file.size > 3_000_000) return { ok: false, message: "That file is larger than 3 MB; split it or remove unused columns" };
+    const r = await importContractCsv(await getDb(), s.practiceId, scheduleId, await file.text(), { replace: formData.get("replace") === "on", userId: s.userId });
+    revalidatePath(`/settings/fees/${scheduleId}`);
+    return { ok: true, message: `${r.imported} rates loaded (${r.mppr} subject to the multiple-procedure reduction)${r.problems.length ? `. Skipped ${r.problems.length}: ${r.problems.slice(0, 3).join("; ")}${r.problems.length > 3 ? "..." : ""}` : ""}` };
+  } catch (e) {
+    return { ok: false, message: e instanceof Error ? e.message : "Could not import" };
+  }
 }

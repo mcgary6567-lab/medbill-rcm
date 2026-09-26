@@ -5,6 +5,7 @@ import { getDb } from "@/db";
 import { CAN_ADJUST, requireRole } from "@/lib/auth";
 import type { FormResult } from "@/components/action-form";
 import { saveEnrollment } from "@/server/enrollment";
+import { saveTransactionEnrollments, TRANSACTIONS } from "@/server/transaction-enrollment";
 
 export async function saveEnrollmentAction(providerId: string, payerId: string, _prev: FormResult, formData: FormData): Promise<FormResult> {
   const s = await requireRole(CAN_ADJUST);
@@ -23,6 +24,19 @@ export async function saveEnrollmentAction(providerId: string, payerId: string, 
     }, s.userId);
     revalidatePath("/settings/enrollment");
     return { ok: true, message: "Saved" };
+  } catch (e) {
+    return { ok: false, message: e instanceof Error ? e.message : "Could not save" };
+  }
+}
+
+export async function saveTransactionEnrollmentAction(payerId: string, _prev: FormResult, formData: FormData): Promise<FormResult> {
+  const s = await requireRole(CAN_ADJUST);
+  try {
+    const statuses = Object.fromEntries(TRANSACTIONS.map((t) => [t.key, String(formData.get(t.key) ?? "")]).filter(([, v]) => v));
+    const changed = await saveTransactionEnrollments(await getDb(), s.practiceId, payerId, statuses, s.userId);
+    revalidatePath("/settings/enrollment");
+    revalidatePath("/remittance");
+    return { ok: true, message: changed.length ? "Saved" : "No changes" };
   } catch (e) {
     return { ok: false, message: e instanceof Error ? e.message : "Could not save" };
   }

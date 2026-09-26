@@ -34,11 +34,13 @@ export interface ClaimBundle {
   payer: typeof payers.$inferSelect;
   provider: typeof providers.$inferSelect;
   practice: typeof practices.$inferSelect;
+  /** Where the visit happened, when the practice has more than one location. */
+  location?: typeof schema.locations.$inferSelect | null;
 }
 
 export async function loadClaimBundle(db: Db, claimId: string): Promise<ClaimBundle | null> {
   const [row] = await db
-    .select({ claim: claims, encounter: encounters, patient: patients, insurance: patientInsurances, payer: payers, provider: providers, practice: practices })
+    .select({ claim: claims, encounter: encounters, patient: patients, insurance: patientInsurances, payer: payers, provider: providers, practice: practices, location: schema.locations })
     .from(claims)
     .innerJoin(encounters, eq(encounters.id, claims.encounterId))
     .innerJoin(patients, eq(patients.id, claims.patientId))
@@ -46,6 +48,7 @@ export async function loadClaimBundle(db: Db, claimId: string): Promise<ClaimBun
     .innerJoin(payers, eq(payers.id, claims.payerId))
     .innerJoin(providers, eq(providers.id, encounters.providerId))
     .innerJoin(practices, eq(practices.id, claims.practiceId))
+    .leftJoin(schema.locations, eq(schema.locations.id, encounters.locationId))
     .where(eq(claims.id, claimId))
     .limit(1);
   if (!row) return null;
@@ -295,6 +298,41 @@ async function recordAcknowledgments(db: Db, claimId: string, controlNumber: str
     });
   }
   return mine;
+}
+
+/**
+ * A 277CA that arrived on its own (polled from the clearinghouse, hours after
+ * the claim went out): each claim it mentions gets the acknowledgment, and
+ * moves to accepted or rejected. A rejection opens a denial to work, the same
+ * as a rejection at submission.
+ */
+export async function applyInbound277(db: Db, practiceId: string, raw: string) {
+  const summary = { accepted: 0, rejected: 0, unmatched: 0 };
+  for (const a of parse277CA(raw)) {
+    const [claim] = a.controlNumber ? await db.select().from(claims).where(and(eq(claims.practiceId, practiceId), eq(claims.controlNumber, a.controlNumber))).limit(1) : [];
+    if (!claim) { summary.unmatched++; continue; }
+    const code = [a.category, a.statusCode, a.entity].filter(Boolean).join(":");
+    await db.insert(claimAcknowledgments).values({ claimId: claim.id, kind: "277CA", accepted: a.accepted, code, message: a.message, raw });
+    const open = ["submitted", "pending", "accepted"].includes(claim.status);
+    if (a.accepted) {
+      summary.accepted++;
+      if (claim.status === "submitted" || claim.status === "pending") {
+        await db.update(claims).set({ status: "accepted", payerClaimNumber: a.payerClaimNumber || claim.payerClaimNumber, updatedAt: new Date() }).where(eq(claims.id, claim.id));
+        await db.insert(claimEvents).values({ claimId: claim.id, status: "accepted", source: "clearinghouse", message: `277CA ${code}: ${a.message}` });
+        await emit(db, practiceId, "claim.status_changed", { claim_id: claim.id, control_number: claim.controlNumber, status: "accepted", message: a.message });
+      }
+      continue;
+    }
+    summary.rejected++;
+    if (!open) continue;
+    await db.update(claims).set({ status: "rejected", updatedAt: new Date() }).where(eq(claims.id, claim.id));
+    await db.insert(claimEvents).values({ claimId: claim.id, status: "rejected", source: "clearinghouse", message: `277CA ${code}: ${a.message}` });
+    const exp = await explainRejection(code, a.message);
+    await db.insert(denials).values({ practiceId, claimId: claim.id, category: "coding", carc: code || "277CA", amountCents: claim.totalCents, explanation: exp.explanation, nextSteps: exp.nextSteps, status: "open" });
+    await emit(db, practiceId, "claim.status_changed", { claim_id: claim.id, control_number: claim.controlNumber, status: "rejected", message: a.message });
+    await emit(db, practiceId, "denial.created", { claim_id: claim.id, control_number: claim.controlNumber, carc: code || "277CA", category: "coding", amount_cents: claim.totalCents, explanation: exp.explanation });
+  }
+  return summary;
 }
 
 export async function listAcknowledgments(db: Db, claimId: string) {

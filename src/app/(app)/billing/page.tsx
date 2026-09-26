@@ -4,7 +4,7 @@ import { requireSession } from "@/lib/auth";
 import {
   ensureDefaultPolicies, listPlans, listPolicies, listStatements, patientsWithBalances, totalPatientBalances,
 } from "@/server/billing";
-import { createPolicyAction, sendPayLinksAction, statementBatchAction, togglePolicyAction } from "@/app/(app)/billing-actions";
+import { createPolicyAction, mailUnsentStatementsAction, sendPayLinksAction, statementBatchAction, togglePolicyAction } from "@/app/(app)/billing-actions";
 import { practiceConfig } from "@/server/integrations";
 import { stripeReady } from "@/lib/stripe";
 import { ActionForm, SubmitButton } from "@/components/action-form";
@@ -31,6 +31,7 @@ export default async function BillingPage() {
   const onPlans = active.reduce((a, p) => a + p.totalCents - p.paidCents, 0);
   const admin = s.role === "admin";
   const cfg = await practiceConfig(db, s.practiceId);
+  const lob = !!cfg.lob;
   const canPay = ["admin", "biller"].includes(s.role);
   const payReady = stripeReady(cfg.stripe);
   const msgReady = !!(cfg.twilio || cfg.resend);
@@ -90,6 +91,14 @@ export default async function BillingPage() {
               <Field label="Minimum balance ($)"><input name="min" type="number" step="0.01" min="0.01" defaultValue="5.00" className="input" /></Field>
               <SubmitButton pendingLabel="Generating statements...">Generate statements</SubmitButton>
             </ActionForm>
+            <div className="mt-4 border-t border-slate-200 pt-4 text-sm">
+              {lob ? (
+                <ActionForm action={mailUnsentStatementsAction} className="space-y-2">
+                  <p className="text-slate-600">Print and mail every generated statement that has not gone out, through Lob. Patients without a complete address are skipped.</p>
+                  <SubmitButton className="btn btn-secondary" pendingLabel="Sending to Lob...">Mail unsent statements</SubmitButton>
+                </ActionForm>
+              ) : <p className="text-slate-600">To print and mail statements automatically, connect Lob under <Link href="/settings/integrations" className="font-semibold text-brand-700 hover:underline">Integrations</Link>.</p>}
+            </div>
           </Card>
 
           <Card title="Discount policies">

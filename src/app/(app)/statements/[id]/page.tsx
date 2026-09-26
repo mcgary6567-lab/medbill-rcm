@@ -3,8 +3,9 @@ import { notFound } from "next/navigation";
 import { getDb } from "@/db";
 import { requireSession } from "@/lib/auth";
 import { getStatement } from "@/server/billing";
-import { markStatementSentAction, voidStatementAction } from "@/app/(app)/billing-actions";
-import { PrintButton } from "@/components/action-form";
+import { mailStatementAction, markStatementSentAction, voidStatementAction } from "@/app/(app)/billing-actions";
+import { practiceConfig } from "@/server/integrations";
+import { ActionForm, PrintButton, SubmitButton } from "@/components/action-form";
 import { Badge } from "@/components/ui";
 import { fmtDate, money } from "@/lib/utils";
 
@@ -24,6 +25,7 @@ export default async function StatementPage({ params }: { params: Promise<{ id: 
   if (!row) notFound();
   const { statement: st, patient, practice } = row;
   const visits = st.detail.visits;
+  const lob = !!(await practiceConfig(db, s.practiceId)).lob;
 
   return (
     <div className="mx-auto max-w-4xl">
@@ -36,9 +38,13 @@ export default async function StatementPage({ params }: { params: Promise<{ id: 
             {st.status}{st.channel ? ` · ${st.channel}` : ""}
           </Badge>
           <PrintButton label="Print statement" />
+          {st.mailId && <span className="text-xs text-slate-500">Lob {st.mailId}{st.mailStatus === "test" ? " (test, not mailed)" : ""}</span>}
+          {st.status === "generated" && lob && (
+            <ActionForm action={mailStatementAction.bind(null, st.id)}><SubmitButton pendingLabel="Sending to Lob...">Mail with Lob</SubmitButton></ActionForm>
+          )}
           {st.status === "generated" && (
             <form action={markStatementSentAction.bind(null, st.id, "print")}>
-              <button className="btn btn-primary">Mark as mailed</button>
+              <button className={lob ? "btn btn-secondary" : "btn btn-primary"}>Mark as mailed</button>
             </form>
           )}
           {st.status !== "void" && (

@@ -7,6 +7,7 @@ export const SETTINGS_SECTIONS: { title: string; links: SettingsLink[] }[] = [
     links: [
       { href: "/settings", label: "Overview", description: "Setup health and every setting in one place" },
       { href: "/settings/profile", label: "Practice profile", description: "Legal name, NPI, tax ID and address sent on every claim", adminOnly: true, keywords: "billing provider npi ein tin address phone" },
+      { href: "/settings/locations", label: "Locations", description: "Clinics and facilities where you see patients; sent on claims as the service facility", adminOnly: true, keywords: "site office facility address multi location 2310c" },
       { href: "/settings/providers", label: "Providers", description: "Add, edit and deactivate rendering providers", keywords: "doctor physician npi taxonomy" },
       { href: "/settings/payers", label: "Payers", description: "Payer IDs, types, timely filing and appeal windows", keywords: "insurance payer id timely filing" },
       { href: "/settings/fees", label: "Fee schedules", description: "Standard charges and payer contract rates", keywords: "prices contract rates cpt" },

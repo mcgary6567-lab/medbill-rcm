@@ -160,15 +160,16 @@ export class StediClearinghouse implements ClearinghouseGateway {
     for (const t of body.items ?? []) {
       if (t.direction !== "INBOUND" || !t.transactionId) continue;
       const set = t.x12?.transactionSetIdentifier ?? "";
-      if (set !== "835") { items.push({ transactionId: t.transactionId, transactionSet: set, x12: null }); continue; }
+      // Remittances (835) and claim acknowledgments (277CA) are read; other sets are only recorded.
+      if (set !== "835" && set !== "277") { items.push({ transactionId: t.transactionId, transactionSet: set, x12: null }); continue; }
       const artifact = t.artifacts?.find((a) => a.usage === "input" && a.artifactType === "application/edi-x12" && a.url);
       if (!artifact?.url) { items.push({ transactionId: t.transactionId, transactionSet: set, x12: null }); continue; }
       const file = await this.get(artifact.url);
-      if (!file.ok) throw new Error(`Stedi returned ${file.status} for 835 ${t.transactionId}`);
+      if (!file.ok) throw new Error(`Stedi returned ${file.status} for ${set} ${t.transactionId}`);
       let x12 = file.text;
       if (x12.trimStart().startsWith("{")) {
         const link = (JSON.parse(x12) as { documentDownloadUrl?: string }).documentDownloadUrl;
-        if (!link) throw new Error(`Stedi returned no file for 835 ${t.transactionId}`);
+        if (!link) throw new Error(`Stedi returned no file for ${set} ${t.transactionId}`);
         const doc = await this.http(link, { method: "GET", headers: {} });
         x12 = await doc.text();
       }

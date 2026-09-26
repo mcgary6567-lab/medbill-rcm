@@ -5,6 +5,7 @@ import { getDb } from "@/db";
 import { requireRole } from "@/lib/auth";
 import type { FormResult } from "@/components/action-form";
 import { removeFhir, saveFhir, syncFhir, testFhir } from "@/server/fhir";
+import { generateSmartKey, saveSmartSettings } from "@/server/fhir-smart";
 
 const admin = () => requireRole(["admin"]);
 const fail = (e: unknown, fallback: string): FormResult => ({ ok: false, message: e instanceof Error ? e.message : fallback });
@@ -46,4 +47,26 @@ export async function removeFhirAction(_prev: FormResult): Promise<FormResult> {
   await removeFhir(await getDb(), s.practiceId, s.userId);
   revalidatePath("/settings/fhir");
   return { ok: true, message: "Disconnected" };
+}
+
+export async function saveSmartAction(_prev: FormResult, fd: FormData): Promise<FormResult> {
+  const s = await admin();
+  try {
+    await saveSmartSettings(await getDb(), s.practiceId, { mode: String(fd.get("mode") ?? "token"), clientId: String(fd.get("clientId") ?? ""), tokenUrl: String(fd.get("tokenUrl") ?? ""), scope: String(fd.get("scope") ?? "") }, s.userId);
+    revalidatePath("/settings/fhir");
+    return { ok: true, message: "Saved. Test the connection to get a token." };
+  } catch (e) {
+    return fail(e, "Could not save");
+  }
+}
+
+export async function generateSmartKeyAction(_prev: FormResult): Promise<FormResult> {
+  const s = await admin();
+  try {
+    await generateSmartKey(await getDb(), s.practiceId, s.userId);
+    revalidatePath("/settings/fhir");
+    return { ok: true, message: "New signing key made. If the EHR copied the old public key instead of reading the JWKS URL, register the new one." };
+  } catch (e) {
+    return fail(e, "Could not make a key");
+  }
 }

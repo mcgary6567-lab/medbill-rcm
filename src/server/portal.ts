@@ -21,6 +21,7 @@ import { createTask } from "./work";
 import { stripeClient, stripeReady, type Stripe, type StripeEvent } from "@/lib/stripe";
 import { practiceConfig } from "./integrations";
 import { emit } from "./webhooks";
+import { settleTerminalPayment } from "./terminal";
 
 const { portalLinks, onlinePayments, savedCards, patients, practices, ledgerEntries, statements } = schema;
 
@@ -149,6 +150,13 @@ export async function startPortalPayment(
  * for autopay when asked; a repeated event changes nothing.
  */
 export async function handleStripeEvent(db: Db, event: StripeEvent, client?: Pick<Stripe, "getPaymentIntent" | "getPaymentMethod">, expectedPracticeId?: string) {
+  // Card-present payments from a front desk reader settle through their own table (server/terminal.ts).
+  if (event.type === "payment_intent.succeeded") {
+    const pi = event.data.object as { id: string; metadata?: Record<string, string> };
+    if (!pi.metadata?.terminal_payment_id) return { handled: false };
+    const settled = await settleTerminalPayment(db, pi.id, expectedPracticeId);
+    return { handled: !!settled };
+  }
   if (event.type !== "checkout.session.completed" && event.type !== "checkout.session.async_payment_succeeded") return { handled: false };
   const s = event.data.object as { id: string; payment_status?: string; metadata?: Record<string, string>; payment_intent?: string | null; customer?: string | null };
   if (s.payment_status !== "paid") return { handled: false };

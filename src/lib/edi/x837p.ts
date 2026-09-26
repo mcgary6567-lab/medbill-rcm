@@ -21,6 +21,17 @@ export function pwk(a: ClaimAttachmentRef): string[] {
 
 export type OtherPayer = NonNullable<Edi837Input["otherPayer"]>;
 
+/** Where the service was performed, when it is not the billing provider's address (loop 2310C). */
+export type ServiceFacility = { name: string; npi?: string | null; address1: string; city: string; state: string; zip: string };
+
+export function serviceFacilityLoop(f: ServiceFacility): string[][] {
+  return [
+    f.npi ? ["NM1", "77", "2", f.name, "", "", "", "", "XX", f.npi] : ["NM1", "77", "2", f.name],
+    ["N3", f.address1],
+    ["N4", f.city, f.state, f.zip.replace("-", "")],
+  ];
+}
+
 /**
  * Loops 2320/2330 of any 837 (P, I or D) on a secondary claim: the primary
  * coverage, its claim-level adjustments (CAS), what it paid (AMT*D), and the
@@ -57,6 +68,7 @@ export interface Edi837Input {
     zip: string;
   };
   renderingProvider: { lastName: string; firstName: string; npi: string; taxonomy: string };
+  serviceFacility?: ServiceFacility | null;
   payer: { name: string; payerId: string };
   subscriber: {
     lastName: string;
@@ -174,6 +186,7 @@ export function buildEdi837P(input: Edi837Input): string {
   // 2310B rendering provider
   s.push(["NM1", "82", "1", input.renderingProvider.lastName, input.renderingProvider.firstName, "", "", "", "XX", input.renderingProvider.npi]);
   s.push(["PRV", "PE", "PXC", input.renderingProvider.taxonomy]);
+  if (input.serviceFacility) s.push(...serviceFacilityLoop(input.serviceFacility));
   if (input.otherPayer) s.push(...otherPayerLoops(input.otherPayer));
   // 2400 service lines
   input.lines.forEach((line, idx) => {

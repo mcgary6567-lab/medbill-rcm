@@ -9,21 +9,21 @@
  *    whose NPI matches the Practitioner on it. It then shows under Missed
  *    charges until someone enters its charges, which is where coding happens.
  *
- * Authentication is a bearer token the practice pastes (from the EHR's
- * backend app registration). Obtaining tokens automatically with SMART
- * backend services (signed JWT client assertions) is not built. Read only:
- * nothing is written back to the EHR.
+ * Authentication is either a bearer token the practice pastes, or SMART
+ * backend services, where each sync gets a fresh token with a signed JWT
+ * (server/fhir-smart.ts). Read only: nothing is written back to the EHR.
  */
 import { and, eq } from "drizzle-orm";
 import type { Db } from "@/db";
 import { schema } from "@/db";
 import { appSecret } from "@/lib/app-secret";
 import { seal, unseal } from "@/lib/seal";
+import { smartAccessToken } from "./fhir-smart";
 
 const { fhirConnections, patients, appointments, providers, auditLog } = schema;
 const MAX_PAGES = 20;
 
-type Http = (url: string, init: { headers: Record<string, string> }) => Promise<{ ok: boolean; status: number; json(): Promise<unknown> }>;
+type Http = (url: string, init: { method?: string; headers: Record<string, string>; body?: string }) => Promise<{ ok: boolean; status: number; json(): Promise<unknown> }>;
 type Resource = Record<string, unknown> & { resourceType: string; id: string };
 type Bundle = { entry?: { resource?: Resource }[]; link?: { relation: string; url: string }[] };
 
@@ -47,9 +47,10 @@ export async function removeFhir(db: Db, practiceId: string, userId?: string) {
   await db.insert(auditLog).values({ practiceId, userId: userId ?? null, action: "fhir_removed", entity: "practice", entityId: practiceId });
 }
 
-function client(conn: { baseUrl: string; tokenSealed: string | null }, http: Http) {
+async function client(conn: typeof fhirConnections.$inferSelect, http: Http) {
   const headers: Record<string, string> = { Accept: "application/fhir+json" };
-  if (conn.tokenSealed) headers.Authorization = `Bearer ${unseal(conn.tokenSealed, appSecret())}`;
+  if (conn.authMode === "smart") headers.Authorization = `Bearer ${await smartAccessToken(conn, http)}`;
+  else if (conn.tokenSealed) headers.Authorization = `Bearer ${unseal(conn.tokenSealed, appSecret())}`;
   return async (url: string) => {
     const full = url.startsWith("http") ? url : `${conn.baseUrl}/${url}`;
     // Follow-up page links must stay on the same server, so a token is never sent elsewhere.
@@ -63,7 +64,7 @@ function client(conn: { baseUrl: string; tokenSealed: string | null }, http: Htt
 export async function testFhir(db: Db, practiceId: string, http: Http = fetch as unknown as Http) {
   const conn = await getFhir(db, practiceId);
   if (!conn) throw new Error("Save the FHIR connection first");
-  const cap = (await client(conn, http)("metadata")) as { resourceType?: string; fhirVersion?: string; software?: { name?: string } };
+  const cap = (await (await client(conn, http))("metadata")) as { resourceType?: string; fhirVersion?: string; software?: { name?: string } };
   if (cap.resourceType !== "CapabilityStatement") throw new Error("That address did not answer like a FHIR server");
   return `${cap.software?.name ?? "FHIR server"}, FHIR ${cap.fhirVersion ?? "unknown version"}`;
 }
@@ -97,7 +98,7 @@ const NPI_SYSTEM = "http://hl7.org/fhir/sid/us-npi";
 export async function syncFhir(db: Db, practiceId: string, opts: { http?: Http; now?: Date; userId?: string } = {}) {
   const conn = await getFhir(db, practiceId);
   if (!conn) throw new Error("Connect a FHIR server first");
-  const get = client(conn, opts.http ?? (fetch as unknown as Http));
+  const get = await client(conn, opts.http ?? (fetch as unknown as Http));
   const now = opts.now ?? new Date();
   const since = (conn.lastSyncAt ?? new Date(now.getTime() - 30 * 86_400_000)).toISOString();
   const result = { patientsCreated: 0, patientsUpdated: 0, visits: 0, skipped: [] as string[] };

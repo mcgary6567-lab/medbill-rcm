@@ -13,7 +13,7 @@
  * claims before relying on it.
  */
 import { envelope } from "./x12";
-import { otherPayerLoops, pwk, type ClaimAttachmentRef, type OtherPayer } from "./x837p";
+import { otherPayerLoops, pwk, serviceFacilityLoop, type ClaimAttachmentRef, type OtherPayer, type ServiceFacility } from "./x837p";
 
 export interface Edi837DInput {
   controlNumber: string;
@@ -36,6 +36,7 @@ export interface Edi837DInput {
   };
   /** Set on a secondary claim: the primary payer's adjudication (loops 2320/2330). */
   otherPayer?: OtherPayer;
+  serviceFacility?: ServiceFacility | null;
   lines: { cdt: string; chargeCents: number; units: number; dateOfService: string; tooth?: string | null; surfaces?: string | null; oralCavity?: string | null }[];
 }
 
@@ -81,6 +82,7 @@ export function buildEdi837D(input: Edi837DInput): string {
   // 2310B rendering dentist
   body.push(["NM1", "82", "1", input.rendering.lastName, input.rendering.firstName, "", "", "", "XX", input.rendering.npi]);
   body.push(["PRV", "PE", "PXC", input.rendering.taxonomy]);
+  if (input.serviceFacility) body.push(...serviceFacilityLoop(input.serviceFacility));
   if (input.otherPayer) body.push(...otherPayerLoops(input.otherPayer));
   // 2400 service lines
   input.lines.forEach((l, i) => {

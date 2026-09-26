@@ -20,6 +20,7 @@ const tables = {
   provider: schema.providers,
   payer: schema.payers,
   encounter: schema.encounters,
+  location: schema.locations,
 } as const;
 
 export type Owned = keyof typeof tables;
